@@ -8,6 +8,6 @@ for i in range(len(dataset)):
     unique_element_names = df["ElementName"].unique()
     list = []
     for element_name in unique_element_names:
-        position = df.index[df["ElementName"] == element_name][0]
+        position = df.index[df["ElementName"] == element_name][0] 
         list.append(df["ElementName"][position])
         print(dataset[i], df["ElementName"][position+1], pd.to_datetime(df["DataTime"][position+2])-pd.to_datetime(df["DataTime"][position+1]), pd.to_datetime(df["EndTime"][position+1])-pd.to_datetime(df["StartTime"][position+1]))
