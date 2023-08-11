@@ -22,7 +22,7 @@ for i in range(len(dataset)):
             elementName = element["elementName"]
             description = element["description"]
             time = element["time"]
-            for time_info in time:
+            #for time_info in time:
                 if elementName=="T" or elementName=="AT" or elementName=="Td" or elementName=="RH" or elementName=="MaxT" or elementName=="MinT" or elementName=="MaxAT" or elementName=="MinAT" or elementName=="PoP6h" or elementName=="PoP12h" or elementName=="PoP24h" or elementName=="WD" or elementName=="WeatherDescription":
                     for time_info in time:
                         start_time = time_info.get('startTime')
