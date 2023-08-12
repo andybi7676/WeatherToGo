@@ -31,12 +31,12 @@ export default function MapCard({ item }) {
           <View style={tw`basis-1/3 flex-row pt-1`}>
             <Text >WeatherToGo: </Text>
           </View>
-          <View style={tw`basis-1/3 flex-row`}>
+          {/* <View style={tw`basis-1/3 flex-row`}>
             <Rating rating={item.rating}/>
-          </View>
+          </View> */}
         </View>
         <Divider style={tw`mt-1 mb-1`}/>
-        <Text style={tw`text-base font-medium mb-2`}>舒適度指數: {comfortText}</Text>
+        {/* <Text style={tw`text-base font-medium mb-2`}>舒適度指數: {comfortText}</Text>
         <View style={tw`flex flex-row mb-1`}>
           <Text style={tw`basis-1/3`}>溫度: {item.temp.toFixed(2)}</Text>
           <Text style={tw`basis-1/3`}>濕度: {item.humidity.toFixed(2)}%</Text>
@@ -45,8 +45,7 @@ export default function MapCard({ item }) {
         <View style={tw`flex flex-row`}>
           <Text style={tw`basis-1/2`}>紫外線強度: {uvText}</Text>
           <Text style={tw`basis-1/2`}>空氣品質: {airText}</Text>
-          {/* <Text style={tw`basis-1/3`}>體感溫度: {bodyTemp.toFixed(2)}</Text> */}
-        </View>
+        </View> */}
       </TouchableOpacity>
     </View>
   )

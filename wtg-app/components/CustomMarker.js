@@ -4,24 +4,28 @@ import { Marker, Callout } from 'react-native-maps'
 import Rating from './Rating';
 import tw from 'twrnc';
 import { wrapString } from '../utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeCurIdx, selectPlacesCurIdx } from '../redux/explore/placesInfoSlice';
 
-export default function CustomMarker({place, idx, curIdx, changeCurIdx}) {
+export default function CustomMarker({place, idx}) {
   // const [ idx, setIdx ] = useState(idx);
-  const [ reload, setReload ] = useState(false);
+  const dispatch = useDispatch();
+  const curIdx = useSelector(selectPlacesCurIdx);
+  // const [ reload, setReload ] = useState(false);
   const markerRef = useRef();
   
   useEffect(() => {
-    if (curIdx == idx) {
+    if (curIdx.value == idx) {
       markerRef.current.showCallout();
-      setReload(!reload);
+      // setReload(!reload);
     }
     else {
       markerRef.current.hideCallout();
     }
-  }, [curIdx]);
+  }, [curIdx.value]);
 
   const onPressMarker = () => {
-    changeCurIdx(idx, source="marker");
+    dispatch(changeCurIdx({value: idx, source: "marker"}));
   }
 
   return (
@@ -31,7 +35,7 @@ export default function CustomMarker({place, idx, curIdx, changeCurIdx}) {
       coordinate={place.coordinate}
       title={place.name}
       description={place.name}
-      opacity={idx === curIdx ? 1.0 : 0.5}
+      opacity={idx === curIdx.value ? 1.0 : 0.5}
       onPress={onPressMarker}
     >
       <Callout style={[styles.callout]}>

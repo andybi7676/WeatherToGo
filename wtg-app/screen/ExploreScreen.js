@@ -2,46 +2,40 @@ import { Text, View, SafeAreaView } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Dimensions } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { changeCurIdx, selectPlacesInfo } from '../redux/explore/placesInfoSlice';
 import tw from 'twrnc'
-
-import { CustomMarker, MapCard, GooglePlaceInput } from '../components';
+import Carousel from 'react-native-reanimated-carousel';
+import { CustomMarker, MapCard, GooglePlaceInput, MapCardList } from '../components';
 
 const defaultDelta = { "longitudeDelta": 0.007499, "latitudeDelta": 0.014845242592592591};
 const defaultCoordinate = {"latitude": 25.034121609153654, "longitude": 121.56402111053467};
 const initialRegion = { ...defaultCoordinate, ...defaultDelta };
 const width = Dimensions.get('window').width;
 
-const defaultIndex = 0;
-
-const tmpPlaces = [
-];
-
 export default function ExploreScreen({ navigation }) {
-  const [ places, setPlaces ] = useState(tmpPlaces);
+  const dispatch = useDispatch();
+  const placesInfo = useSelector(selectPlacesInfo);
   const [ coordinate, setCoordinate ] = useState(defaultCoordinate);
   const [ delta, setDelta ] = useState(defaultDelta);
-  const [ index, setIndex ] = useState(defaultIndex);
-  // const moving = useRef(false);
   const mapRef = useRef();
   const carouselRef = useRef();
 
   useEffect(() => {
-    setIndex(defaultIndex);
-    if (places.length > 0) {
-      changeCurIdx(defaultIndex);
+    if (placesInfo.curIdx.value >= 0) {
+      if (placesInfo.curIdx.source !== 'marker') {
+        changeMapCurIdx(placesInfo.curIdx.value);
+      }
+      if (placesInfo.curIdx.source !== 'carousel') {
+        carouselRef.current.scrollTo({"index": placesInfo.curIdx.value, "animated": false});
+      }
     }
-  }, [places]);
+  }, [placesInfo.curIdx]);
 
-  const changeCurIdx = (index, source="carousel") => {
-    setIndex(index);
-    console.log(index)
-    const newRegion = getRegion(places[index].coordinate, delta)
+  const changeMapCurIdx = (index) => {
+    const newRegion = getRegion(placesInfo.places[index].coordinate, delta)
     mapRef.current.animateToRegion(newRegion);
-    if (source !== "carousel") {
-      carouselRef.current.scrollTo({"index": index, "animated": false});
-    }
   };
 
   const mapOnPress = ({coordinate, position, name=null}) => {
@@ -63,11 +57,6 @@ export default function ExploreScreen({ navigation }) {
     setDelta({latitudeDelta: reg.latitudeDelta, longitudeDelta: reg.longitudeDelta});
   };
 
-  const changePlaces = (newPlaces) => {
-    // console.log(newPlaces);
-    setPlaces(newPlaces);
-  };
-
   return <>
     <View style={styles.container}>
       <MapView 
@@ -79,13 +68,11 @@ export default function ExploreScreen({ navigation }) {
         onPoiClick={e => mapOnPress(e.nativeEvent)}
         onRegionChangeComplete={(reg) => setRegion(reg)}
       >
-        {places.map((place, idx) => (
+        {placesInfo.places.map((place, idx) => (
           <CustomMarker 
             key={idx}
             place={place}
             idx={idx}
-            curIdx={index}
-            changeCurIdx={changeCurIdx}
           />
         ))}
       </MapView>
@@ -93,11 +80,11 @@ export default function ExploreScreen({ navigation }) {
         <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`]}>WeatherToGo</Text>
       </View>
       <SafeAreaView style={[tw`w-7/8 h-12 self-center m-4 mt-12 border-gray-400 border-2 rounded-full bg-white`, styles.input]} >
-        <GooglePlaceInput coordinate={coordinate} delta={delta} changePlaces={changePlaces} />
+        <GooglePlaceInput coordinate={coordinate} delta={delta} />
       </SafeAreaView>
       <View style={[styles.carousel, tw`flex-row`]} >
         {
-          places.length > 0 
+          placesInfo.places.length > 0
           ?
           <Carousel
             layout={"default"}
@@ -105,11 +92,11 @@ export default function ExploreScreen({ navigation }) {
             ref={carouselRef}
             width={width}
             height={width*0.6}
-            data={places}
+            data={placesInfo.places}
             mode="parallax"
             pagingEnabled={true}
             scrollAnimationDuration={500}
-            onSnapToItem={(index) => changeCurIdx(index)}
+            onSnapToItem={(index) => dispatch(changeCurIdx({value: index, source: 'carousel'}))}
             modeConfig={{
               parallaxScrollingScale: 0.9,
               parallaxScrollingOffset: 50,

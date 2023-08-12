@@ -1,47 +1,56 @@
-import { StyleSheet, FlatList } from 'react-native'
-import React, { useState, useRef, useCallback } from 'react'
-
+import { StyleSheet, Dimensions } from 'react-native'
+import React, { useState, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import Carousel from 'react-native-reanimated-carousel';
 import MapCard from './MapCard'
 import tw from 'twrnc'
+import { selectPlacesInfo, changeCurIdx } from '../redux/explore/placesInfoSlice';
 
-const defaultIndex = 0;
+const width = Dimensions.get('window').width;
 
-export default function MapCardList({ data, curIdx, changeCurIdx }) {
-  const [ index, setIndex ] = useState(curIdx);
-  const flatListRef = useRef();
-  const viewConfigRef = useRef({
-      waitForInteraction: true,
-      viewAreaCoveragePercentThreshold: 50,
-  });
-
-  const onViewCallBack = useCallback(({_, viewableItems}) => {
-    if (viewableItems.length > 0) {
-      console.log(`Set index to ${viewableItems[0].index}`);
-      setIndex(viewableItems[0].index);
-    }
-  }, []);
-
-  const finishScrolling = () => {
-    flatListRef.current.scrollToIndex({ animated: true, index: index, viewPosition: 0.5, });
-    changeCurIdx(index);
-    // mapRef.current.animateToRegion(tmpData[index].region);
-  };
+export default function MapCardList() {
+  const placesInfo = useSelector(selectPlacesInfo);
+  const dispatch = useDispatch();
+  const carouselRef = useRef();
+  console.log(placesInfo);
 
   return (
-    <FlatList
-      style={[tw`bg-gray-300/50`]}
-      contentContainerStyle={tw`px-4 bg-yellow-100/1`}
-      horizontal={true}
-      data={data}
-      renderItem={({item}) => <MapCard item={item} pressed={finishScrolling} />}
-      initialScrollIndex={defaultIndex}
-      ref={flatListRef}
-      keyExtractor={item => item.id}
-      viewabilityConfig={viewConfigRef.current}
-      onViewableItemsChanged={onViewCallBack}
-      onMomentumScrollEnd={() => finishScrolling()}
-    />
+    <View style={[styles.carousel, tw`flex-row`]} >
+      {
+        placesInfo.places.length > 0
+        ?
+        <Carousel
+          layout={"default"}
+          loop={false}
+          ref={carouselRef}
+          width={width}
+          height={width*0.6}
+          data={placesInfo.places}
+          mode="parallax"
+          pagingEnabled={true}
+          scrollAnimationDuration={500}
+          onSnapToItem={(index) => dispatch(changeCurIdx({value: index, source: 'carousel'}))}
+          modeConfig={{
+            parallaxScrollingScale: 0.9,
+            parallaxScrollingOffset: 50,
+          }}
+          renderItem={({ item }) => <MapCard item={item} />}
+        />
+        :
+        null
+      }
+    </View>
   )
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  carousel: {
+    flex: 1,
+    position: 'absolute',
+    bottom: 0,
+    marginBottom: 4,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})
