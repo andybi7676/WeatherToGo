@@ -1,70 +1,14 @@
 import { StyleSheet, Text, ScrollView, View, ImageBackground, TouchableOpacity } from 'react-native';
 import { Divider, Icon } from '@rneui/base';
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc'
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { chooseType, setTime, selectWeatherToGoSetting } from '../redux/settings/weatherToGoSettingSlice';
+import { SEGMENT_MILLISECONDS, getRoundedTimeStamp, getSegTime } from '../utils/time';
+import { eventTypes, weatherTypes } from '../utils/config';
 
-const imageDir = "../assets/"
-const eventTypes = {
-  'order': ['日常', "登山", "潛水", "觀星", "衝浪", "跳傘"],
-  '日常': {
-    'src': require('../assets/casual.jpg'),
-  },
-  '登山': {
-    'src': require('../assets/climbing.jpg'),
-  },
-  '潛水': {
-    'src': require('../assets/diving.jpg'),
-  },
-  '觀星': {
-    'src': require('../assets/staring.jpg'),
-  },
-  '衝浪': {
-    'src': require('../assets/surfing.jpg'),
-  },
-  '跳傘': {
-    'src': require('../assets/paragliding.jpg'),
-  }
-}
-
-const weatherTypes = {
-  'order': ['豔陽高照', '風和日麗', '涼爽乾燥', '溼冷有風'],
-  '豔陽高照': {
-    'src': require('../assets/sunny.jpg'),
-  },
-  '風和日麗': {
-    'src': require('../assets/warm.jpg'),
-  },
-  '涼爽乾燥': {
-    'src': require('../assets/cool.jpg'),
-  },
-  '溼冷有風': {
-    'src': require('../assets/cloudy.jpg'),
-  },
-}
-
-SEGMENT_MINUTES = 3 * 60
-SEGMENT_MILLISECONDS = 3 * 60 * 60 * 1000
-
-const getRoundedTimeStamp = () => {
-  const now = new Date();
-  const currentTimeStamp = Date.parse(now);
-  const baseTimeStamp = Date.parse(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
-  const currentRoundedTimeStamp = Math.floor((currentTimeStamp - baseTimeStamp)/ SEGMENT_MILLISECONDS) * SEGMENT_MILLISECONDS + baseTimeStamp;
-  return currentRoundedTimeStamp;
-}
-
-const getSegTime = (currentValue, currentRoundedTimeStamp) => {
-  const segDate = new Date(currentRoundedTimeStamp + SEGMENT_MILLISECONDS * currentValue)
-  return {
-    timeString: segDate.toTimeString(),
-    year: segDate.getFullYear(),
-    month: segDate.getMonth()+1,
-    date: segDate.getDate(),
-    hours: segDate.getHours(),
-    minutes: segDate.getMinutes(),
-  }
-}
+import BasicSettingCard from './BasicSettingCard';
 
 const TimeSliderMarkerLeft = ({segTime}) => {
   return <>
@@ -94,8 +38,26 @@ const TimeSliderMarkerRight = ({segTime}) => {
   </>
 }
 
+MIN_SEG_VAL = 0
+MAX_SEG_VAL = 55
+
 export default function BasicSetting() {
-  const currentRoundedTimeStamp = getRoundedTimeStamp();
+  const [currentRoundedTimeStamp, _] = useState(getRoundedTimeStamp());
+  const dispatch = useDispatch();
+  const weatherToGoSetting = useSelector(selectWeatherToGoSetting);
+  
+  useEffect(() => {
+    dispatch(setTime({startTime: currentRoundedTimeStamp, endTime: currentRoundedTimeStamp+SEGMENT_MILLISECONDS*55}));
+  }, []);
+
+  const setSegTimes = (values) => {
+    const newSegTimes = {
+      'startTime': currentRoundedTimeStamp + values[0]*SEGMENT_MILLISECONDS,
+      'endTime': currentRoundedTimeStamp + values[1]*SEGMENT_MILLISECONDS,
+    }
+    dispatch(setTime(newSegTimes))
+  }
+
   return (
     <ScrollView style={[tw`p-2`]}>
       <View style={tw`flex rounded-3xl bg-white py-3 my-2 justify-center`}>
@@ -104,20 +66,19 @@ export default function BasicSetting() {
         <Divider/>
         <View style={tw`self-center justify-end h-26 p-2 pb-4`}>
           <MultiSlider
-            values={[0, 55]}
-            min={0}
-            max={56}
-            step={1}
+            values={[MIN_SEG_VAL, MAX_SEG_VAL]}
+            min={MIN_SEG_VAL}
+            max={MAX_SEG_VAL}
             snapped={true}
             isMarkersSeparated={true}
-            onValuesChangeFinish={(values) => console.log(values.map((val, _) => getSegTime(val, currentRoundedTimeStamp)))}
+            onValuesChangeFinish={(values) => setSegTimes(values)}
             customMarkerLeft={(e) => {
-                return (<TimeSliderMarkerLeft
-                  segTime={getSegTime(e.currentValue, currentRoundedTimeStamp)} />)
+              return (<TimeSliderMarkerLeft
+                segTime={getSegTime(e.currentValue, currentRoundedTimeStamp)} />)
             }}
             customMarkerRight={(e) => {
-                return (<TimeSliderMarkerRight
-                  segTime={getSegTime(e.currentValue, currentRoundedTimeStamp)} />)
+              return (<TimeSliderMarkerRight
+                segTime={getSegTime(e.currentValue, currentRoundedTimeStamp)} />)
             }}
             showSteps={true}
             showStepLabels={true}
@@ -131,15 +92,9 @@ export default function BasicSetting() {
         <Divider />
         <View style={[tw`flex-row justify-center flex-wrap pt-4`]}>
           {
-            eventTypes.order.map((eventName, idx) => {
-              return (
-                <TouchableOpacity style={tw`w-40 m-1 rounded-xl shadow-lg`} key={idx}>
-                  <ImageBackground style={tw`h-40 flex-col-reverse`} imageStyle={tw` border-gray-200 rounded-xl opacity-100`} source={eventTypes[eventName].src} resizeMode="cover">
-                    <Text style={[tw`m-2 text-lg text-white `, styles.textOnImage]}>{eventName}</Text>
-                  </ImageBackground>
-                </TouchableOpacity>
-              )
-            })
+            eventTypes.order.map((name, idx) => (
+              <BasicSettingCard key={idx} selected={name===weatherToGoSetting.chosenType} name={name} src={eventTypes[name].src}/>
+            ))
           }        
         </View>
       </View>
@@ -149,15 +104,9 @@ export default function BasicSetting() {
         <Divider/>
         <View style={[tw`flex-row justify-center flex-wrap pt-4`]}>
           {
-            weatherTypes.order.map((weatherName, idx) => {
-              return (
-                <TouchableOpacity style={tw`w-40 m-1 rounded-xl shadow-lg`} key={idx}>
-                  <ImageBackground style={tw`h-40 flex-col-reverse`} imageStyle={tw` border-gray-200 rounded-xl opacity-100`} source={weatherTypes[weatherName].src} resizeMode="cover">
-                    <Text style={[tw`m-2 text-lg text-white `, styles.textOnImage]}>{weatherName}</Text>
-                  </ImageBackground>
-                </TouchableOpacity>
-              )
-            })
+            weatherTypes.order.map((name, idx) => (
+              <BasicSettingCard key={idx} selected={name===weatherToGoSetting.chosenType} name={name} src={weatherTypes[name].src}/>
+            ))
           }        
         </View>
       </View>
@@ -167,9 +116,5 @@ export default function BasicSetting() {
 }
 
 const styles = StyleSheet.create({
-  textOnImage: {
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: {width: -1, height: 1},
-    textShadowRadius: 12
-  }
+  
 })
