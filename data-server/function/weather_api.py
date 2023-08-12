@@ -74,20 +74,63 @@ def get_weather_data(loc_dict):
         loc_result = find_neareat_location(loc_dict)
     
         # get the weather data
-        '''
-        "below is the pesudo code for getting the weather data"
-
         # open the corresponding netCDF file using index
         loc_idx = loc_result['idx']
-        nc_file = ...
+        nc_file = "weather_data_attractions_"+loc_idx+".nc"
 
         # and get the weather data
-        data = ... 
-        
+        loc_name = loc_result['name']
+        df = xr.open_dataset(nc_file).to_dataframe()
+        data = df[df['LocationName']==loc_name]
+        data_list = data.groupby(["ElementName", "description", "Measures"]).agg({'Value': lambda r: [i for i in r]})
+        time_list = data.groupby(["ElementName", "description", "Measures"]).agg({'StartTime': lambda r: [i for i in r]}).iloc[0]
+
         # and return it in json
-        weather_info = ...
-        
-        '''
-        
-    
-        # return weather_info
+        weather_info = {
+            'attraction': name,
+            'lon'       : lon,
+            'lat'       : lat,
+            'Elements'  : [
+                {
+                    'ElementName'   : row[0],
+                    'description'   : row[1],
+                    'Measures'      : row[2],
+                    'Value'         : data_list.loc[row]['Value']
+                }
+                for row in data_list.index
+            ]
+        }
+        weather_info['Elements'].append({'ElementName':'Time' ,'description': '時間', 'Measures': 's', 'Value':time_list['StartTime']})
+
+        print('Demand: ', loc_dict)
+        print('Result: ', loc_result)
+        return weather_info, data
+
+
+if __name__ == "__main__":
+    # TEST DATA for get_weather_data() , T is true data, F is faked data.
+    test1_T = {
+        'name': '宜蘭河濱公園',
+        'lon': 121.759243,
+        'lat': 24.76544
+    }
+
+    test2_T = {
+        'name': '七星潭',
+        'lon': 121.630132,
+        'lat': 24.024398
+    }
+
+    test3_T = {
+        'name': '員山公園',
+        'lon': 121.7224954,
+        'lat': 24.74597021
+    }
+
+    test3_F = {
+        'name': '應該要是 員山公園',
+        'lon': 121.72249,
+        'lat': 24.74597021
+    } #idx = 045
+
+    weather_info, data = get_weather_data(test3_F)
