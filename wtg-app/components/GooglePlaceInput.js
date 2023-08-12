@@ -23,7 +23,7 @@ export default function GooglePlaceInput({ coordinate, delta, changePlaces }) {
   useEffect(() => {
     console.log(searchPlacesConn);
     if(searchPlacesConn.success) {
-      console.log(`Get response: ${JSON.stringify(searchPlacesConn.response)}`);
+      // console.log(`Get response: ${JSON.stringify(searchPlacesConn.response)}`);
       const results = searchPlacesConn.response.results
       // setEvents(connection.response || []);
       const newPlaces = results.map((res, idx) => {
@@ -31,6 +31,12 @@ export default function GooglePlaceInput({ coordinate, delta, changePlaces }) {
           "id": idx,
           "name": res.name,
           "coordinate": { "latitude": res.geometry.location.lat, "longitude": res.geometry.location.lng },
+          "rating": rating = Math.round(Math.random() * 4 + 1),
+          "temp": Math.random()* (38-20) + 20, 
+          "humidity": Math.random()* (100-50) + 50,
+          "comfortIdx": Math.round(Math.random() * 3 + 1),
+          "uvIdx": Math.round(Math.random() * 2 + 1),
+          "airIdx": Math.round(Math.random() * 3 + 1),
         };
         return newPlace;
       });
@@ -57,13 +63,14 @@ export default function GooglePlaceInput({ coordinate, delta, changePlaces }) {
   return <>
     <TextInput 
       style={[tw`w-7/8 h-full p-2`]}
-      placeholder="Search"
+      inlineImageLeft='search_icon'
+      placeholder="輸入目的地查看天氣資訊"
       enterKeyHint='search'
       onChangeText={newText => setPrompt(newText)}
       onEndEditing={search}
     />
     {/* <Icon style={tw`w-1/8 bg-green-100 h-full`} color={"black"} name="search"/> */}
-    <Icon color={"black"} name="search" onPress={() => console.log(prompt)}/>
+    <Icon color={"black"} name="tune" onPress={() => console.log("Settings")}/>
   </>;
 };
 

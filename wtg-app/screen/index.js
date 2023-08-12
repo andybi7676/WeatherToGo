@@ -1,5 +1,7 @@
-import MapScreen from "./MapScreen";
+import ExploreScreen from "./ExploreScreen";
+import SettingsScreen from "./SettingsScreen";
 
 export { 
-  MapScreen,
+  ExploreScreen,
+  SettingsScreen,
 };
