@@ -8,6 +8,7 @@ import WeatherInfoSection from "./WeatherInfoSection";
 import WeatherPreferenceSetting from "./WeatherPreferenceSetting";
 import BasicSetting from "./BasicSetting";
 import SimplifiedWeatherInfo from "./SimplifiedWeatherInfo";
+import WeatherIcon from "./WeatherIcon";
 
 export {
     MapCard,
@@ -20,4 +21,5 @@ export {
     WeatherPreferenceSetting,
     BasicSetting,
     SimplifiedWeatherInfo,
+    WeatherIcon,
 };

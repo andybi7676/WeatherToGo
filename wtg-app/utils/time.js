@@ -20,3 +20,15 @@ export const getSegTime = (currentValue, currentRoundedTimeStamp) => {
     minutes: segDate.getMinutes(),
   }
 }
+
+export const getTime = (milliSecondTimeStamp) => {
+  const segDate = new Date(milliSecondTimeStamp)
+  return {
+    timeString: segDate.toTimeString(),
+    year: segDate.getFullYear(),
+    month: segDate.getMonth()+1,
+    date: segDate.getDate(),
+    hours: segDate.getHours(),
+    minutes: segDate.getMinutes(),
+  }
+}

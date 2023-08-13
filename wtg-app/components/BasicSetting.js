@@ -62,8 +62,8 @@ export default function BasicSetting() {
       JSON.stringify(                       //body
         {
           'time_setting': {
-            'start': weatherToGoSetting.startTime,
-            'end': weatherToGoSetting.endTime,
+            'start': weatherToGoSetting.startTime / 1000,
+            'end': weatherToGoSetting.endTime / 1000,
           },
           'activity': {
             'type': 'daily',

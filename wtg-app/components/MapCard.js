@@ -8,7 +8,8 @@ import { updateOnePlace } from '../redux/explore/placesInfoSlice';
 import { useAPI } from '../hooks';
 import { DATA_SERVER_URL } from "@env"
 import SimplifiedWeatherInfo from './SimplifiedWeatherInfo';
-// 溫度 濕度 體感溫度 降雨機率 舒適度指數(0~31) 紫外線指數 (0~11) 空氣品質(0~400)
+import { wrapString } from '../utils';
+
 const window = Dimensions.get('window')
 
 export default function MapCard({ item }) {
@@ -42,10 +43,10 @@ export default function MapCard({ item }) {
 
 
   return (
-    <View style={[styles.card, tw`p-2 m-2 bg-white rounded-2xl border-gray-400 h-50 shadow-lg`]}>
+    <View style={[styles.card, tw`p-2 m-2 bg-white rounded-2xl border-gray-400 h-60 shadow-lg`]}>
       <TouchableOpacity >
         <View>
-          <Text style={tw`text-base font-semibold`}>{item.name}</Text>
+          <Text style={tw`text-base font-semibold`}>{wrapString(item.name, 20)}</Text>
         </View>
         <View style={tw`flex flex-row`}>
           <View style={tw`basis-1/3 flex-row p-1 h-8 `}>
@@ -59,11 +60,10 @@ export default function MapCard({ item }) {
             }
           </View>
         </View>
-        <Divider />
         {
           weatherInfo === null
           ?
-          <Skeleton animation="wave" style={tw`h-32 rounded-lg opacity-15 mt-1`} />
+          <Skeleton animation="wave" style={tw`h-40 rounded-lg opacity-15 mt-1`} />
           :
           <SimplifiedWeatherInfo weatherInfo={weatherInfo}/>
         }

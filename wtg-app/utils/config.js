@@ -36,3 +36,21 @@ export const weatherTypes = {
     'src': require('../assets/cloudy.jpg'),
   },
 }
+
+export const weatherToImgSrc = {
+  "day-clear": require('../assets/weatherpng/day-clear.png'),
+  "day-cloudy": require('../assets/weatherpng/day-cloudy.png'),
+  "day-fog": require('../assets/weatherpng/day-fog.png'),
+  "day-cloudy-fog": require('../assets/weatherpng/day-cloudy-fog.png'),
+  "day-partially-clear-with-rain": require('../assets/weatherpng/day-partially-clear-with-rain.png'),
+  "day-thunderstorm": require('../assets/weatherpng/day-thunderstorm.png'),
+  "day-snowing": require('../assets/weatherpng/day-snowing.png'),
+
+  "night-clear": require('../assets/weatherpng/night-clear.png'),
+  "night-cloudy": require('../assets/weatherpng/night-cloudy.png'),
+  "night-fog": require('../assets/weatherpng/night-fog.png'),
+  "night-cloudy-fog": require('../assets/weatherpng/night-cloudy-fog.png'),
+  "night-partially-clear-with-rain": require('../assets/weatherpng/night-partially-clear-with-rain.png'),
+  "night-thunderstorm": require('../assets/weatherpng/night-thunderstorm.png'),
+  "night-snowing": require('../assets/weatherpng/night-snowing.png'),
+}

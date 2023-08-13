@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { changeCurIdx, selectPlacesInfo } from '../redux/explore/placesInfoSlice';
 import tw from 'twrnc'
 import Carousel from 'react-native-reanimated-carousel';
-import { CustomMarker, MapCard, GooglePlaceInput, MapCardList } from '../components';
+import { CustomMarker, MapCard, GooglePlaceInput } from '../components';
 
 const defaultDelta = { "longitudeDelta": 0.007499, "latitudeDelta": 0.014845242592592591};
 const defaultCoordinate = {"latitude": 25.034121609153654, "longitude": 121.56402111053467};
@@ -91,7 +91,7 @@ export default function ExploreScreen({ navigation }) {
             loop={false}
             ref={carouselRef}
             width={width}
-            height={width*0.6}
+            height={width*0.7}
             data={placesInfo.places}
             mode="parallax"
             pagingEnabled={true}
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'absolute',
     bottom: 0,
-    marginBottom: 4,
+    marginBottom: 2,
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
