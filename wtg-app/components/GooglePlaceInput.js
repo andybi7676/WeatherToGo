@@ -32,11 +32,6 @@ export default function GooglePlaceInput({ coordinate, delta }) {
           "google_rating": res.rating,
           "google_map_link": `https://www.google.com/maps/place/?q=place_id:${res.place_id}`,
           "rating": rating = Math.round(Math.random() * 4 + 1),
-          "temp": Math.random()* (38-20) + 20, 
-          "humidity": Math.random()* (100-50) + 50,
-          "comfortIdx": Math.round(Math.random() * 3 + 1),
-          "uvIdx": Math.round(Math.random() * 2 + 1),
-          "airIdx": Math.round(Math.random() * 3 + 1),
         };
         return newPlace;
       });

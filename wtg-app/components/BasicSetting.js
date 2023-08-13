@@ -1,5 +1,5 @@
-import { StyleSheet, Text, ScrollView, View, ImageBackground, TouchableOpacity } from 'react-native';
-import { Divider, Icon } from '@rneui/base';
+import { StyleSheet, Text, ScrollView, View, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
+import { Divider, Icon, SocialIcon } from '@rneui/base';
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc'
@@ -7,8 +7,11 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { chooseType, setTime, selectWeatherToGoSetting } from '../redux/settings/weatherToGoSettingSlice';
 import { SEGMENT_MILLISECONDS, getRoundedTimeStamp, getSegTime } from '../utils/time';
 import { eventTypes, weatherTypes } from '../utils/config';
+import { useAPI } from '../hooks';
+import { DATA_SERVER_URL } from '@env'
 
 import BasicSettingCard from './BasicSettingCard';
+const window = Dimensions.get('window');
 
 const TimeSliderMarkerLeft = ({segTime}) => {
   return <>
@@ -45,20 +48,41 @@ export default function BasicSetting() {
   const [currentRoundedTimeStamp, _] = useState(getRoundedTimeStamp());
   const dispatch = useDispatch();
   const weatherToGoSetting = useSelector(selectWeatherToGoSetting);
+  const [postBasicSettingConn, postBasicSetting] = useAPI('json');
+  const [closeLoading, setCloseLoading] = useState(false);
   
   useEffect(() => {
     dispatch(setTime({startTime: currentRoundedTimeStamp, endTime: currentRoundedTimeStamp+SEGMENT_MILLISECONDS*55}));
   }, []);
+  
+  useEffect(() => {
+    postBasicSetting(
+      `${DATA_SERVER_URL}/get_weather`,     //url
+      "POST",                               //method
+      JSON.stringify(                       //body
+        {
+          'time_setting': {
+            'start': weatherToGoSetting.startTime,
+            'end': weatherToGoSetting.endTime,
+          },
+          'activity': {
+            'type': 'daily',
+          }
+        }
+      ),
+      {"Content-Type": "application/json"}, //headers
+    )
+  }, [weatherToGoSetting])
 
   const setSegTimes = (values) => {
     const newSegTimes = {
       'startTime': currentRoundedTimeStamp + values[0]*SEGMENT_MILLISECONDS,
       'endTime': currentRoundedTimeStamp + values[1]*SEGMENT_MILLISECONDS,
     }
-    dispatch(setTime(newSegTimes))
+    dispatch(setTime(newSegTimes));
   }
 
-  return (
+  return <>
     <ScrollView style={[tw`p-2`]}>
       <View style={tw`flex rounded-3xl bg-white py-3 my-2 justify-center`}>
         <Text style={tw`text-xl text-slate-500 p-2 pl-3 pt-1 pb-0 font-semibold`}>選擇活動從事的時間</Text>
@@ -111,10 +135,29 @@ export default function BasicSetting() {
         </View>
       </View>
       <Divider style={tw`p-2 opacity-0`} width={1}/>
+      {/* <Dialog overlayStyle={tw`bg-transparent border-0`} isVisible={true}>
+        <Dialog.Loading style={tw`bg-white`} />
+      </Dialog> */}
     </ScrollView>
-  )
+    {
+      postBasicSettingConn.loading
+      ?
+      <View style={[tw`w-full h-full bg-slate-100 opacity-50`, styles.loadingContainer, ]}>
+        <SocialIcon style={tw`shadow-none bg-transparent`} type='github' light loading/>
+      </View>
+      :
+      null
+    }
+  </>
 }
 
 const styles = StyleSheet.create({
-  
+  loadingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    // top: window.height*0.25, 
+  }
 })
