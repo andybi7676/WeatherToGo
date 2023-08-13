@@ -11,7 +11,6 @@ import threading
 dataset = ['003', '005', '009', '011', '015', '017', '021', '023', '027', '029', '031', '035', '039', '041', '045', '047', '051', '053', '057', '059', '063', '065', '069', '071', '076', '078', '082', '084']
 FETCH_CWB_RATE = 6 # 6hr: 00, 06,12,18L, update after 1 hr. -> 01, 07, 13, 19
 
-
 # fetch_cwb() is the same as original to_netcdf_attractoins.py
 def fetch_cwb(isLoop=False):
     start = datetime.datetime.now()

@@ -1,55 +1,33 @@
+#%%
 import numpy as np
 import xarray as xr
+import time
 
 # input red data
-loc_ref = xr.open_dataset('attractions_index.nc')
+loc_ref = xr.open_dataset('function/attractions_index.nc')
 
-def get_fake_weather_data(coords):
-    
-    # fake weather data
-    fake_weather = {
-        'latitude': coords['lat'],
-        'longitude': coords['lon'],
-        'temperature': 25,
-        'humidity': 70,
-        'description': 'Sunny',
-    }
-
-    return fake_weather
+acticity_list = {
+    'daily': {'3hr': ['WeatherDescription','AT','WS','CI'],
+              '12hr': ['WeatherDescription','MaxAT','WS','MaxCI']}
+}
 
 
 def find_neareat_location(loc_dict):
 
     # get the location information
-    name = loc_dict['name']
     lat = loc_dict['lat']
     lon = loc_dict['lon']
-
-    # chekc if the location is in the dataset
-    if name in loc_ref['LocationName'].values:
-        
-        # find the index of the location
-        loc_index = np.where(loc_ref['LocationName'].values == name)[0][0]
-        
-        # and get lat and lon
-        loc_lat = loc_ref['lat'].values[loc_index]
-        loc_lon = loc_ref['lon'].values[loc_index]
-        loc_idx = loc_ref['idx'].values[loc_index]
-
-        # print('Location found:', name, loc_lat, loc_lon)
     
-    # if not, use the lat and lon to find the nearest location using the distance formula
-    else:
-        # calculate the distance between the location and all the locations in the dataset
-        distances = np.sqrt((loc_ref['lat'].values - lat)**2 + (loc_ref['lon'].values - lon)**2)
+    # calculate the distance between the location and all the locations in the dataset
+    distances = np.sqrt((loc_ref['lat'].values - lat)**2 + (loc_ref['lon'].values - lon)**2)
 
-        # find the index of the minimum distance
-        loc_index = np.argmin(distances)
-        loc_lat = loc_ref['lat'].values[loc_index]
-        loc_lon = loc_ref['lon'].values[loc_index]
-        loc_idx = loc_ref['idx'].values[loc_index]
+    # find the index of the minimum distance
+    loc_index = np.argmin(distances)
+    loc_lat = loc_ref['lat'].values[loc_index]
+    loc_lon = loc_ref['lon'].values[loc_index]
+    loc_idx = loc_ref['idx'].values[loc_index]
 
-        # print('Nearest location:', loc_ref['LocationName'].values[loc_index])
+    # print('Nearest location:', loc_ref['LocationName'].values[loc_index])
 
     # return the location information in json
     loc_result = {
@@ -62,32 +40,49 @@ def find_neareat_location(loc_dict):
 
     return(loc_result)
 
+def get_weather_data(data):
 
-def get_weather_data(loc_dict):
-    
-        # get the location information
-        name = loc_dict['name']
+        time_setting = data['time_setting']
+        activity_type = data['activity']
+        loc_dict = data['location']
+
+        # get the basic information
         lat = loc_dict['lat']
         lon = loc_dict['lon']
+        time_interval = [time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime(time_setting['start'])), time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime(time_setting['end']))]
+        activity = acticity_list[activity_type['type']]
     
         # find the nearest location
         loc_result = find_neareat_location(loc_dict)
     
-        # get the weather data
-        # open the corresponding netCDF file using index
-        loc_idx = loc_result['idx']
-        nc_file = "weather_data_attractions_"+loc_idx+".nc"
-
-        # and get the weather data
+        # get the weather data (open the corresponding netCDF file using index)
         loc_name = loc_result['name']
-        df = xr.open_dataset(nc_file).to_dataframe()
+        loc_idx3 = loc_result['idx']
+        loc_idx12 = '%03d'%(int(loc_idx3)-2)
+        nc_file3 = "../data_from_cwb/weather_data_attractions_"+loc_idx3+".nc"
+        nc_file12 = "../data_from_cwb/weather_data_attractions_"+loc_idx12+".nc"
+
+        # get the weather data and time (3 hr.)
+        df = xr.open_dataset(nc_file3).to_dataframe()
         data = df[df['LocationName']==loc_name]
-        data_list = data.groupby(["ElementName", "description", "Measures"]).agg({'Value': lambda r: [i for i in r]})
-        time_list = data.groupby(["ElementName", "description", "Measures"]).agg({'StartTime': lambda r: [i for i in r]}).iloc[0]
+        data_list3 = data.groupby(["ElementName", "description", "Measures"]).agg({'Value': lambda r: [i for i in r]}).loc[activity['3hr']]
+        time_list3 = np.array(data.groupby(["ElementName", "description", "Measures"]).agg({'DataTime': lambda r: [i for i in r]}).iloc[0]['DataTime'])
+
+        # get the weather data and time (12 hr.)
+        df = xr.open_dataset(nc_file12).to_dataframe()
+        data = df[df['LocationName']==loc_name]
+        data_list12 = data.groupby(["ElementName", "description", "Measures"]).agg({'Value': lambda r: [i for i in r]}).loc[activity['12hr']]
+        time_list12 = np.array(data.groupby(["ElementName", "description", "Measures"]).agg({'StartTime': lambda r: [i for i in r]}).iloc[0]['StartTime'])
+
+        # merge data
+        for i in range(len(data_list3)):
+            data_list3.iloc[i]['Value'].extend(np.array(data_list12.iloc[i]['Value'])[~np.in1d(time_list12, time_list3)])
+        time_list3 = np.append(time_list3, time_list12[~np.in1d(time_list12, time_list3)])
+        tstr = time_list3[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])]
 
         # and return it in json
         weather_info = {
-            'attraction': name,
+            'attraction': loc_name,
             'lon'       : lon,
             'lat'       : lat,
             'Elements'  : [
@@ -95,42 +90,17 @@ def get_weather_data(loc_dict):
                     'ElementName'   : row[0],
                     'description'   : row[1],
                     'Measures'      : row[2],
-                    'Value'         : data_list.loc[row]['Value']
+                    'Value'         : np.array(data_list3.loc[row]['Value'])[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])].tolist()
                 }
-                for row in data_list.index
+                for row in data_list3.index
             ]
         }
-        weather_info['Elements'].append({'ElementName':'Time' ,'description': '時間', 'Measures': 's', 'Value':time_list['StartTime']})
+        weather_info['Elements'].append({
+            'ElementName':'Time',
+            'description': '時間',
+            'Measures': 's',
+            'Value': [int(time.mktime(time.strptime(tsp, "%Y-%m-%dT%H:%M:%S+08:00"))) for tsp in tstr]
+            })
 
-        print('Demand: ', loc_dict)
-        print('Result: ', loc_result)
-        return weather_info, data
 
-
-if __name__ == "__main__":
-    # TEST DATA for get_weather_data() , T is true data, F is faked data.
-    test1_T = {
-        'name': '宜蘭河濱公園',
-        'lon': 121.759243,
-        'lat': 24.76544
-    }
-
-    test2_T = {
-        'name': '七星潭',
-        'lon': 121.630132,
-        'lat': 24.024398
-    }
-
-    test3_T = {
-        'name': '員山公園',
-        'lon': 121.7224954,
-        'lat': 24.74597021
-    }
-
-    test3_F = {
-        'name': '應該要是 員山公園',
-        'lon': 121.72249,
-        'lat': 24.74597021
-    } #idx = 045
-
-    weather_info, data = get_weather_data(test3_F)
+        return weather_info
