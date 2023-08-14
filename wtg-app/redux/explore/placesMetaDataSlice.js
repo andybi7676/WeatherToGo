@@ -52,7 +52,6 @@ export const placesInfoSlice = createSlice({
     toggleOneFavorite: (state, action) => {
       const updateId = action.payload;
       state.places[updateId].isFavorite = !state.places[updateId].isFavorite;
-      console.log("placeMetaDataSlice", updateId, state.places[updateId])
     },
 
     deleteAllPlaces: (state) => {

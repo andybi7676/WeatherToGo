@@ -12,7 +12,7 @@ export default function MapCardList() {
   const placesInfo = useSelector(selectPlacesInfo);
   const dispatch = useDispatch();
   const carouselRef = useRef();
-  console.log(placesInfo);
+  // console.log(placesInfo);
 
   return (
     <View style={[styles.carousel, tw`flex-row`]} >

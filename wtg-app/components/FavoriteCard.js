@@ -19,6 +19,7 @@ export default function FavoriteCard({ id, weatherNames, startIdx }) {
   // const [ weatherInfo, setWeatherInfo ] = useState(null);
   const dispatch = useDispatch();
   const item = useSelector(state => state.placesMetaData.places[id]);
+  // console.log(weatherNames)
 
   return <>
     {

@@ -36,9 +36,9 @@ export default function FullWeatherInfo({id, startIdx=0}) {
 
   const [simpleWeatherInfo, setSimpleWeatherInfo] = useState({})
   const weatherInfo = useSelector(selectWeatherInfos)[id]
-  console.log(startIdx)
 
   useEffect(() => {
+    if (weatherInfo.time === undefined) return ;
     if (weatherInfo.time.length <= 0) return;
     const elementLength = weatherInfo.time.length;
     let slicedWeatherInfo = {}
@@ -49,7 +49,7 @@ export default function FullWeatherInfo({id, startIdx=0}) {
         }
       }
     }
-    console.log(slicedWeatherInfo)
+    if (slicedWeatherInfo.time === undefined) return;
     const downsample_rate = Math.ceil(slicedWeatherInfo.time.length / MAX_FRAMES_IN_CARD);
     let newSimpleWeatherInfo = {
       elementLength: slicedWeatherInfo.time.length,
@@ -235,13 +235,13 @@ export default function FullWeatherInfo({id, startIdx=0}) {
     {
       simpleWeatherInfo["流速"]
       ?
-      <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+      <View style={tw`h-15 -mt-2 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
         <LineChart
           data={{
             labels: simpleWeatherInfo['time'],
             datasets: [
               {
-                data: simpleWeatherInfo['流速'],
+                data: simpleWeatherInfo['流速'].map((val) => parseFloat(val)),
                 color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
                 strokeWidth: 3, // optional
               }
@@ -266,7 +266,6 @@ export default function FullWeatherInfo({id, startIdx=0}) {
           }}
           bezier
         />
-        // null
       </View>
       :
       null
@@ -274,13 +273,13 @@ export default function FullWeatherInfo({id, startIdx=0}) {
     {
       simpleWeatherInfo["浪高"]
       ?
-      <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+      <View style={tw`h-15 -mt-5 -mb-3 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
         <LineChart
           data={{
             labels: simpleWeatherInfo['time'],
             datasets: [
               {
-                data: simpleWeatherInfo['浪高'],
+                data: simpleWeatherInfo['浪高'].map((val) => parseFloat(val)*10),
                 color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
                 strokeWidth: 3, // optional
               }
@@ -325,10 +324,10 @@ export default function FullWeatherInfo({id, startIdx=0}) {
       :
       null
     }
-    <View style={tw`h-15 -mt-2 -mb-1 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
-      {
-        simpleWeatherInfo["紫外線指數"]
-        ?
+    {
+      simpleWeatherInfo["紫外線指數"]
+      ?
+      <View style={tw`h-15 -mt-2 -mb-1 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
         <LineChart
           data={{
             labels: simpleWeatherInfo['time'],
@@ -359,11 +358,10 @@ export default function FullWeatherInfo({id, startIdx=0}) {
           }}
           bezier
         />
-        // null
-        :
-        null
-      }
-    </View>
+      </View>
+      :
+      null
+    }
   </View>
 }
 
