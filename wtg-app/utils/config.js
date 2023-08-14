@@ -54,3 +54,23 @@ export const weatherToImgSrc = {
   "night-thunderstorm": require('../assets/weatherpng/night-thunderstorm.png'),
   "night-snowing": require('../assets/weatherpng/night-snowing.png'),
 }
+
+export const chosenTypeToWeatherNames = {
+  '日常': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
+  '登山': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
+  '潛水': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線"],
+  '觀星': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度"],
+  '衝浪': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線"],
+  '跳傘': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
+}
+
+export const weatherNameToLogo = {
+  "時間": require("../assets/weatherTypepng/time.png"),
+  "天氣現象": require("../assets/weatherTypepng/weather.png"),
+  "風速": require("../assets/weatherTypepng/air.png"),
+  "浪高": require("../assets/weatherTypepng/wave.png"),
+  "降雨機率": require("../assets/weatherTypepng/humid.png"),
+  "體感溫度": require("../assets/weatherTypepng/thermometer.png"),
+  "紫外線": require("../assets/weatherTypepng/sun.png"),
+  "舒適度": require("../assets/weatherTypepng/cool.png"),
+}

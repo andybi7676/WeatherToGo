@@ -71,7 +71,7 @@ export default function ExploreScreen({ navigation }) {
       >
         {placesOrder.map((placeId, idx) => (
           <CustomMarker 
-            key={`marker-${placeId}`}
+            key={`marker-${placeId}-${idx}`}
             placeId={placeId}
             idx={idx}
           />

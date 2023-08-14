@@ -33,8 +33,6 @@ export const placesInfoSlice = createSlice({
         source: 'searchInput',
         coordinate: newOrder.length > 0 ? combinedNewPlaces[newOrder[0]].coordinate : null,
       }
-      // console.log(state.places)
-      // console.log(state);
     },
     
     changeCurIdx: (state, action) => {
@@ -54,6 +52,7 @@ export const placesInfoSlice = createSlice({
     toggleOneFavorite: (state, action) => {
       const updateId = action.payload;
       state.places[updateId].isFavorite = !state.places[updateId].isFavorite;
+      console.log("placeMetaDataSlice", updateId, state.places[updateId])
     },
 
     deleteAllPlaces: (state) => {

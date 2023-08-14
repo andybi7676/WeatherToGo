@@ -49,7 +49,7 @@ export default function MapCard({ id }) {
     <View style={[styles.card, tw`p-2 m-2 bg-white rounded-2xl border-gray-400 h-60 shadow-lg`]}>
       <TouchableOpacity >
         <View style={tw`flex flex-row`}>
-          <Text style={tw`text-base font-semibold basis-3/4`}>{wrapString(item.name, 15)}</Text>
+          <Text style={tw`text-base font-semibold basis-3/4`}>{wrapString(item.name, 12)}</Text>
           <View style={tw`basis-1/4 -mb-6 flex-row justify-end p-2 pt-1`}>
             <TouchableOpacity style={tw`border-black`} onPress={() => dispatch(toggleOneFavorite(item.id))}>
               {

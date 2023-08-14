@@ -107,7 +107,7 @@ export default function SimplifiedWeatherInfo({id}) {
         null
       }
     </View>
-    <View style={tw`h-10 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+    <View style={tw`h-15 -mt-3 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
       {
         simpleWeatherInfo["體感溫度"]
         ?
@@ -123,14 +123,14 @@ export default function SimplifiedWeatherInfo({id}) {
             ], 
             // legend: ["體感溫度"] // optional
           }}
-          width={screenWidth*0.9}
-          height={62}
+          width={screenWidth*0.85}
+          height={50}
           chartConfig={{
             ...chartConfig, 
-            fillShadowGradientFrom: "#fa6132", 
+            fillShadowGradientFrom: "#ff1a1a", 
             fillShadowGradientFromOpacity: 1,
-            fillShadowGradientTo: "#42a1ff",
-            fillShadowGradientToOpacity: 0.5,
+            fillShadowGradientTo: "#00cc00",
+            fillShadowGradientToOpacity: 0.3,
           }}
           withHorizontalLabels={false}
           withVerticalLabels={false}

@@ -2,11 +2,13 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Button, Skeleton, SocialIcon } from '@rneui/base'
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
+import { useSelector } from 'react-redux'
+import { selectWeatherInfos } from '../redux/explore/placesWeatherInfoSlice'
 import { getTime } from '../utils/time';
 import WeatherIcon from './WeatherIcon';
 import { Dimensions } from "react-native";
 const screenWidth = Dimensions.get("window").width;
-import { LineChart } from 'react-native-chart-kit';
+import { LineChart, BarChart } from 'react-native-chart-kit';
 
 const MAX_FRAMES_IN_CARD = 8
 const VALID_SIMPLIFIED_ELEMENTNAMES = ["天氣現象", "體感溫度", "時間", "12小時降雨機率"]
@@ -29,9 +31,10 @@ const chartConfig = {
   // }
 };
 
-export default function FullWeatherInfo({weatherInfo}) {
+export default function FullWeatherInfo({id}) {
 
   const [simpleWeatherInfo, setSimpleWeatherInfo] = useState({})
+  const weatherInfo = useSelector(selectWeatherInfos)[id]
   
   useEffect(() => {
     if (weatherInfo.time.length <= 0) return;
@@ -54,8 +57,8 @@ export default function FullWeatherInfo({weatherInfo}) {
     setSimpleWeatherInfo(newSimpleWeatherInfo);
   }, [weatherInfo])
 
-  return <View style={tw`h-40 rounded-lg bg-slate-100 mt-1 pt-1`}>
-    <View style={tw`h-6 border-gray-500 flex flex-row justify-center `}>
+  return <View style={tw`h-auto rounded-lg bg-slate-100 mt-1 pt-1 `}>
+    <View style={tw`h-5 border-gray-500 flex flex-row justify-center `}>
       {
         simpleWeatherInfo["shownDates"]
         ?
@@ -68,7 +71,7 @@ export default function FullWeatherInfo({weatherInfo}) {
         null
       }
     </View>
-    <View style={tw`h-6 border-black flex flex-row justify-center`}>
+    <View style={tw`h-5 border-black flex flex-row justify-center`}>
       {
         simpleWeatherInfo["降採時間"]
         ?
@@ -81,7 +84,7 @@ export default function FullWeatherInfo({weatherInfo}) {
         null
       }
     </View>
-    <View style={tw`h-10 border-black flex flex-row justify-center`}>
+    <View style={tw`h-10 z-10 border-black flex flex-row justify-center`}>
       {
         simpleWeatherInfo["天氣現象"]
         ?
@@ -104,7 +107,7 @@ export default function FullWeatherInfo({weatherInfo}) {
         null
       }
     </View>
-    <View style={tw`h-10 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+    <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
       {
         simpleWeatherInfo["體感溫度"]
         ?
@@ -120,14 +123,14 @@ export default function FullWeatherInfo({weatherInfo}) {
             ], 
             // legend: ["體感溫度"] // optional
           }}
-          width={screenWidth*0.9}
-          height={62}
+          width={screenWidth*0.85}
+          height={50}
           chartConfig={{
             ...chartConfig, 
-            fillShadowGradientFrom: "#fa6132", 
+            fillShadowGradientFrom: "#ff1a1a", 
             fillShadowGradientFromOpacity: 1,
-            fillShadowGradientTo: "#42a1ff",
-            fillShadowGradientToOpacity: 0.5,
+            fillShadowGradientTo: "#00cc00",
+            fillShadowGradientToOpacity: 0.3,
           }}
           withHorizontalLabels={false}
           withVerticalLabels={false}
@@ -143,6 +146,84 @@ export default function FullWeatherInfo({weatherInfo}) {
         null
       }
     </View>
+    <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+      {
+        simpleWeatherInfo["12小時降雨機率"]
+        ?
+        <LineChart
+          data={{
+            labels: simpleWeatherInfo['時間'],
+            datasets: [
+              {
+                data: simpleWeatherInfo['12小時降雨機率'],
+                // color: (opacity = 0) => `rgba(20, 20, 20, ${opacity})`, // optional
+                strokeWidth: 0, // optional
+              }
+            ], 
+            // legend: ["體感溫度"] // optional
+          }}
+          width={screenWidth*0.85}
+          height={50}
+          chartConfig={{
+            ...chartConfig, 
+            fillShadowGradientFrom: "#b3e6ff", 
+            fillShadowGradientFromOpacity: 0.3,
+            fillShadowGradientTo: "#b3e6ff",
+            fillShadowGradientToOpacity: 1,
+          }}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          style={{
+            paddingRight:0
+          }}
+        />
+        // null
+        :
+        null
+      }
+    </View>
+    {/* <View style={tw`h-15 -mt-4 border-black border-2 flex flex-row justify-center `}>
+      {
+        simpleWeatherInfo["12小時降雨機率"]
+        ?
+        <BarChart
+          data={{
+            labels: simpleWeatherInfo['time'],
+            datasets: [
+              {
+                data: simpleWeatherInfo['12小時降雨機率'],
+                // color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
+                // strokeWidth: 3, // optional
+              }
+            ], 
+            // legend: ["體感溫度"] // optional
+          }}
+          width={screenWidth*0.9}
+          height={50}
+          chartConfig={{
+            ...chartConfig, 
+            color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`,
+            fillShadowGradientFrom: "#3ec4ed", 
+            fillShadowGradientFromOpacity: 1,
+            fillShadowGradientTo: "#3ec4ed",
+            fillShadowGradientToOpacity: 0.3,
+          }}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          style={{
+            paddingRight:0
+          }}
+          bezier
+        />
+        // null
+        :
+        null
+      }
+    </View> */}
   </View>
 }
 

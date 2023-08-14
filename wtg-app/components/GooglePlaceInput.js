@@ -8,7 +8,7 @@ import { GOOGLE_MAP_API_KEY } from "@env"
 import { useAPI } from '../hooks';
 import tw from 'twrnc'
 
-const MAX_PLACES = 15
+const MAX_PLACES = 10
 const LONGTITUDE_DELTA_METERS_RATIO = 111139
 
 export default function GooglePlaceInput({ coordinate, delta }) {
@@ -17,20 +17,22 @@ export default function GooglePlaceInput({ coordinate, delta }) {
   const places = useSelector(selectPlaces)
   // console.log(coordinateToLocationRepr(coordinate));
   const [ prompt, setPrompt ] = useState("");
-  const [ searchPlacesConn, searchPlaces ] = useAPI('json');
+  const [ searchPlacesConn, searchPlaces, searchPlacesConnInit ] = useAPI('json');
 
   const radius = delta.longitudeDelta * LONGTITUDE_DELTA_METERS_RATIO
 
   useEffect(() => {
-    console.log(searchPlacesConn);
     if(searchPlacesConn.success) {
       // console.log(`Get response: ${JSON.stringify(searchPlacesConn.response)}`);
       const results = searchPlacesConn.response.results || [];
-      const favoriteIds = placesOrder.filter((id) => places[id].isFavorite === true)
+      const favoriteIds = placesOrder.filter((id) => {
+        console.log(`${id}, ${places[id]}`)
+        return places[id].isFavorite === true
+      })
       // setEvents(connection.response || []);
       let newPlaces = {}
       const newIds = results.slice(0, MAX_PLACES-favoriteIds.length).map((res, idx) => {
-        const id = `${res.geometry.location.lat}-${res.geometry.location.lng}`
+        const id = `${res.geometry.location.lat}-${res.geometry.location.lng}-${res.name}`
         const newPlace = {
           "id": id,
           "index": idx + favoriteIds.length,
@@ -45,8 +47,8 @@ export default function GooglePlaceInput({ coordinate, delta }) {
         newPlaces[id] = newPlace;
         return id
       });
-      console.log(favoriteIds, newIds, newPlaces)
       dispatch(changePlaces({favoriteIds, newIds, newPlaces}));
+      searchPlacesConnInit();
     }
   }, [searchPlacesConn]);
 
