@@ -46,7 +46,7 @@ export default function App() {
               options={{
                 headerShown: false, 
                 tabBarLabel: "Favorite",
-                tabBarIcon: ({color}) => <Icon name={"star"} color={color}></Icon>,
+                tabBarIcon: ({color}) => <Icon name={"favorite"} color={color}></Icon>,
               }} 
             />
           </Tab.Navigator>

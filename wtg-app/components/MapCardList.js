@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Carousel from 'react-native-reanimated-carousel';
 import MapCard from './MapCard'
 import tw from 'twrnc'
-import { selectPlacesInfo, changeCurIdx } from '../redux/explore/placesInfoSlice';
+import { selectPlacesInfo, changeCurIdx } from '../redux/explore/placesMetaDataSlice';
 
 const width = Dimensions.get('window').width;
 

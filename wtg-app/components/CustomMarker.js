@@ -5,11 +5,12 @@ import Rating from './Rating';
 import tw from 'twrnc';
 import { wrapString } from '../utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCurIdx, selectPlacesCurIdx } from '../redux/explore/placesInfoSlice';
+import { changeCurIdx, selectPlaces, selectPlacesCurIdx } from '../redux/explore/placesMetaDataSlice';
 
-export default function CustomMarker({place, idx}) {
+export default function CustomMarker({placeId, idx}) {
   // const [ idx, setIdx ] = useState(idx);
   const dispatch = useDispatch();
+  const place = useSelector(selectPlaces)[placeId];
   const curIdx = useSelector(selectPlacesCurIdx);
   // const [ reload, setReload ] = useState(false);
   const markerRef = useRef();

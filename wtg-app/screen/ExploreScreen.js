@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Dimensions } from 'react-native';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { changeCurIdx, selectPlacesInfo } from '../redux/explore/placesInfoSlice';
+import { changeCurIdx, selectPlacesCurIdx, selectPlacesOrder } from '../redux/explore/placesMetaDataSlice';
 import tw from 'twrnc'
 import Carousel from 'react-native-reanimated-carousel';
 import { CustomMarker, MapCard, GooglePlaceInput } from '../components';
@@ -16,25 +16,26 @@ const width = Dimensions.get('window').width;
 
 export default function ExploreScreen({ navigation }) {
   const dispatch = useDispatch();
-  const placesInfo = useSelector(selectPlacesInfo);
+  const placesOrder = useSelector(selectPlacesOrder);
+  const placesCurIdx = useSelector(selectPlacesCurIdx);
   const [ coordinate, setCoordinate ] = useState(defaultCoordinate);
   const [ delta, setDelta ] = useState(defaultDelta);
   const mapRef = useRef();
   const carouselRef = useRef();
 
   useEffect(() => {
-    if (placesInfo.curIdx.value >= 0) {
-      if (placesInfo.curIdx.source !== 'marker') {
-        changeMapCurIdx(placesInfo.curIdx.value);
+    if (placesCurIdx.value >= 0) {
+      if (placesCurIdx.source !== 'marker') {
+        changeMapCurIdx(placesCurIdx.value);
       }
-      if (placesInfo.curIdx.source !== 'carousel') {
-        carouselRef.current.scrollTo({"index": placesInfo.curIdx.value, "animated": false});
+      if (placesCurIdx.source !== 'carousel') {
+        carouselRef.current.scrollTo({"index": placesCurIdx.value, "animated": false});
       }
     }
-  }, [placesInfo.curIdx]);
+  }, [placesCurIdx]);
 
   const changeMapCurIdx = (index) => {
-    const newRegion = getRegion(placesInfo.places[index].coordinate, delta)
+    const newRegion = getRegion(placesCurIdx.coordinate, delta)
     mapRef.current.animateToRegion(newRegion);
   };
 
@@ -68,10 +69,10 @@ export default function ExploreScreen({ navigation }) {
         onPoiClick={e => mapOnPress(e.nativeEvent)}
         onRegionChangeComplete={(reg) => setRegion(reg)}
       >
-        {placesInfo.places.map((place, idx) => (
+        {placesOrder.map((placeId, idx) => (
           <CustomMarker 
-            key={idx}
-            place={place}
+            key={`marker-${placeId}`}
+            placeId={placeId}
             idx={idx}
           />
         ))}
@@ -84,7 +85,7 @@ export default function ExploreScreen({ navigation }) {
       </SafeAreaView>
       <View style={[styles.carousel, tw`flex-row`]} >
         {
-          placesInfo.places.length > 0
+          placesOrder.length > 0
           ?
           <Carousel
             layout={"default"}
@@ -92,7 +93,7 @@ export default function ExploreScreen({ navigation }) {
             ref={carouselRef}
             width={width}
             height={width*0.7}
-            data={placesInfo.places}
+            data={placesOrder}
             mode="parallax"
             pagingEnabled={true}
             scrollAnimationDuration={500}
@@ -101,7 +102,7 @@ export default function ExploreScreen({ navigation }) {
               parallaxScrollingScale: 0.9,
               parallaxScrollingOffset: 50,
             }}
-            renderItem={({ item }) => <MapCard key={`${item.index}-${item.name}`} index={item.index} item={item} />}
+            renderItem={({ item }) => <MapCard key={`${item}`} id={item} />}
           />
           :
           null

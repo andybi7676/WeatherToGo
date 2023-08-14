@@ -1,19 +1,19 @@
 import { StyleSheet, Text, View, TextInput } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { changePlaces, deleteAllPlaces } from '../redux/explore/placesInfoSlice';
+import { changePlaces, deleteAllPlaces, selectPlaces, selectPlacesOrder } from '../redux/explore/placesMetaDataSlice';
 import { Icon } from '@rneui/themed';
-import { selectPlaces } from '../redux/explore/placesInfoSlice';
 // import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAP_API_KEY } from "@env"
 import { useAPI } from '../hooks';
 import tw from 'twrnc'
 
-const MAX_PLACES = 10
+const MAX_PLACES = 15
 const LONGTITUDE_DELTA_METERS_RATIO = 111139
 
 export default function GooglePlaceInput({ coordinate, delta }) {
   const dispatch = useDispatch();
+  const placesOrder = useSelector(selectPlacesOrder);
   const places = useSelector(selectPlaces)
   // console.log(coordinateToLocationRepr(coordinate));
   const [ prompt, setPrompt ] = useState("");
@@ -26,11 +26,14 @@ export default function GooglePlaceInput({ coordinate, delta }) {
     if(searchPlacesConn.success) {
       // console.log(`Get response: ${JSON.stringify(searchPlacesConn.response)}`);
       const results = searchPlacesConn.response.results || [];
-      const idxBias = places.filter((place) => place.isFavorite === true).length
+      const favoriteIds = placesOrder.filter((id) => places[id].isFavorite === true)
       // setEvents(connection.response || []);
-      const newPlaces = results.slice(0, MAX_PLACES-idxBias).map((res, idx) => {
+      let newPlaces = {}
+      const newIds = results.slice(0, MAX_PLACES-favoriteIds.length).map((res, idx) => {
+        const id = `${res.geometry.location.lat}-${res.geometry.location.lng}`
         const newPlace = {
-          "index": idx + idxBias,
+          "id": id,
+          "index": idx + favoriteIds.length,
           "name": res.name,
           "coordinate": { "latitude": res.geometry.location.lat, "longitude": res.geometry.location.lng },
           "google_rating": res.rating,
@@ -39,9 +42,11 @@ export default function GooglePlaceInput({ coordinate, delta }) {
           "weatherInfoLoaded": false,
           "isFavorite": false
         };
-        return newPlace;
+        newPlaces[id] = newPlace;
+        return id
       });
-      dispatch(changePlaces(newPlaces));
+      console.log(favoriteIds, newIds, newPlaces)
+      dispatch(changePlaces({favoriteIds, newIds, newPlaces}));
     }
   }, [searchPlacesConn]);
 

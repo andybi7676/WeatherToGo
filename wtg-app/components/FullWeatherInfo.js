@@ -1,8 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Button, Skeleton, SocialIcon } from '@rneui/base'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { selectWeatherInfos } from '../redux/explore/placesWeatherInfoSlice'
 import tw from 'twrnc'
 import { getTime } from '../utils/time';
 import WeatherIcon from './WeatherIcon';
@@ -31,10 +29,9 @@ const chartConfig = {
   // }
 };
 
-export default function SimplifiedWeatherInfo({id}) {
+export default function FullWeatherInfo({weatherInfo}) {
 
   const [simpleWeatherInfo, setSimpleWeatherInfo] = useState({})
-  const weatherInfo = useSelector(selectWeatherInfos)[id]
   
   useEffect(() => {
     if (weatherInfo.time.length <= 0) return;

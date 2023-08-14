@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc'
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { chooseType, setTime, selectWeatherToGoSetting } from '../redux/settings/weatherToGoSettingSlice';
-import { deleteAllPlaces, reloadAllPlaces } from '../redux/explore/placesInfoSlice';
+import { deleteAllPlaces, reloadAllPlaces } from '../redux/explore/placesMetaDataSlice';
 import { SEGMENT_MILLISECONDS, getRoundedTimeStamp, getSegTime } from '../utils/time';
 import { eventTypes, weatherTypes } from '../utils/config';
 import { useAPI } from '../hooks';
