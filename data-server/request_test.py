@@ -1,6 +1,7 @@
 #%%
 import requests
 import json
+import time
 
 def check_response(response):
     # check the status code
@@ -21,11 +22,13 @@ data_url = 'http://127.0.0.1:5000/' + 'get_weather'  # adjusted for your IP addr
 input data
 below is following the steps that the user will do in the app
 '''
+time_start = '2023-08-14T00:00:00+08:00'
+time_end = '2023-08-20T12:00:00+08:00'
 
 # Step 1: time setting
 time_setting = {
-    'start': 1692158400, # 2023-08-16T12:00:00+08:00
-    'end': 1692324000 # 2023-08-18T10:00:00+08:00 
+    'start': int(time.mktime(time.strptime(time_start, "%Y-%m-%dT%H:%M:%S+08:00"))),
+    'end': int(time.mktime(time.strptime(time_end, "%Y-%m-%dT%H:%M:%S+08:00")))
 }
 input_data1 = {'time_setting': time_setting}
 response = requests.post(data_url, json=input_data1)
@@ -34,7 +37,7 @@ check_response(response)
 
 # Step 2: activity setting
 activity = {
-        'type': 'daily'
+        'type': '日常'
 }
 input_data2 = {'activity': activity}
 response = requests.post(data_url, json=input_data2)
@@ -51,7 +54,7 @@ response = requests.post(data_url, json=input_data3)
 weather_data = check_response(response)
 
 
-# Step 3: reset
+# Step 4: reset
 reset = {
     'reset': True
 }

@@ -17,14 +17,15 @@ def get_weather():
     if 'activity' in input_data: data['activity'] = input_data['activity'] 
     if 'location' in input_data: data['location'] = input_data['location']
 
-    if ('time_setting' in data) and ('activity' in data) and ('location' in data):
+    if ('time_setting' in data) and ('activity' in data) and (input_data.get("location", None)):
         weather_results = get_weather_data(data)
         print('|    Get weather data')
         return jsonify({'weather': weather_results})
     
     elif ('reset' in input_data):
-        print('|    Reset data', data)
+        print('|    Reset data')
         return jsonify({'weather': 'reset'})
+    
     else:
         print('|    Get initial data', data)
         return jsonify({'weather': 'initial setting'})
@@ -34,5 +35,5 @@ def get_weather():
 if __name__ == '__main__':
 
     # adjust the host ('localhost','0.0.0.0', or specific IP) and port to build the Flask
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, threaded=False)
     
