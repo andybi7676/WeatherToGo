@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity, Pressable, Dimensions } from 'react-native'
-import { Skeleton, Icon, Button } from '@rneui/themed';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native'
+import { Skeleton, Icon, SocialIcon } from '@rneui/themed';
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,11 +10,12 @@ import { DATA_SERVER_URL } from "@env"
 import SimplifiedWeatherInfo from './SimplifiedWeatherInfo';
 import { wrapString } from '../utils';
 import FullWeatherInfo from './FullWeatherInfo';
+import { weatherNameToLogo } from '../utils/config';
 
 
 const window = Dimensions.get('window')
 
-export default function FavoriteCard({ id }) {
+export default function FavoriteCard({ id, weatherNames, startIdx }) {
   // const [ weatherInfo, setWeatherInfo ] = useState(null);
   const dispatch = useDispatch();
   const item = useSelector(state => state.placesMetaData.places[id]);
@@ -40,8 +41,18 @@ export default function FavoriteCard({ id }) {
             </View>
           </View>
           <View style={tw`flex flex-row h-auto`}>
-            <View style={tw`basis-1/3 flex-row p-1 h-8 `}>
-              <Text >WTG: </Text>
+            <View style={tw`basis-1/3 flex-row p-1 h-8`}>
+              <SocialIcon style={tw`self-center opacity-75`} type='google' iconSize={9}/>
+              {
+                item.weatherInfoLoaded
+                ?
+                <Text>{wrapString(`${item.google_rating}`, 3, "")}</Text>
+                :
+                <Skeleton animation="wave" style={tw`rounded-lg opacity-15 h-full w-13`} />
+              }
+            </View>
+            <View style={tw`basis-1/3 flex-row p-1 pl-5 h-8 `}>
+              <ImageBackground style={tw`w-12 h-10 self-center mr-1`} imageStyle={[tw`rounded-lg`]} source={require("../assets/wtg/weathertogo_k.png")} resizeMode="contain" />
               {
                 item.weatherInfoLoaded
                 ?
@@ -52,14 +63,23 @@ export default function FavoriteCard({ id }) {
             </View>
           </View>
           <View style={tw`flex flex-row`}>
-            <View style={tw`w-6 -ml-1 mt-1 border-black flex`}>
-
+            <View style={tw`w-7 -ml-1 mt-1 border-black flex flex-col`}>
+              {
+                weatherNames.map((name, idx) => {
+                  return (
+                    <View key={idx} style={[tw`w-10 h-10 rounded-xl justify-center opacity-80`]}>
+                      <ImageBackground style={tw`h-6 w-6`} imageStyle={[tw`rounded-lg`]} source={weatherNameToLogo[name]} resizeMode="contain">
+                      </ImageBackground>
+                    </View>
+                  )
+                })
+              }
             </View>
             {
               item.weatherInfoLoaded
               ?
-              <View style={tw`pr-6`}>
-                <FullWeatherInfo id={item.id}/>
+              <View style={tw`pr-9`}>
+                <FullWeatherInfo id={item.id} startIdx={startIdx}/>
               </View>
               // <Skeleton animation="wave" style={tw`h-40 rounded-lg opacity-15 mt-1`} />
               :

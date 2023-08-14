@@ -56,12 +56,12 @@ export const weatherToImgSrc = {
 }
 
 export const chosenTypeToWeatherNames = {
-  '日常': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
-  '登山': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
-  '潛水': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線"],
-  '觀星': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度"],
-  '衝浪': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線"],
-  '跳傘': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度", "紫外線"],
+  '日常': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度指數", "紫外線指數"],
+  '登山': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度指數", "紫外線指數"],
+  '潛水': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線指數"],
+  '觀星': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度指數", "紫外線指數"],
+  '衝浪': ["時間", "天氣現象", "體感溫度", "降雨機率", "流速", "浪高", "紫外線指數"],
+  '跳傘': ["時間", "天氣現象", "體感溫度", "降雨機率", "風速", "舒適度指數", "紫外線指數"],
 }
 
 export const weatherNameToLogo = {
@@ -71,6 +71,21 @@ export const weatherNameToLogo = {
   "浪高": require("../assets/weatherTypepng/wave.png"),
   "降雨機率": require("../assets/weatherTypepng/humid.png"),
   "體感溫度": require("../assets/weatherTypepng/thermometer.png"),
-  "紫外線": require("../assets/weatherTypepng/sun.png"),
-  "舒適度": require("../assets/weatherTypepng/cool.png"),
+  "紫外線指數": require("../assets/weatherTypepng/sun.png"),
+  "舒適度指數": require("../assets/weatherTypepng/cool.png"),
+}
+// 指數10以下為非常寒冷，
+// 指數 11-15為寒冷，
+// 指數16至19為稍有寒意，
+// 指數 20至26為舒適，
+// 指數27至30為悶熱，
+// 指數31以上為易中暑。
+export const getCIBG = (ci) => {
+  const ci_val = parseInt(ci);
+  if (ci_val >= 31) return "#ff6600"
+  if (ci_val >= 27) return "#ffcc99"
+  if (ci_val >= 20) return "#ccffcc"
+  if (ci_val >= 16) return "#ccffff"
+  if (ci_val >= 11) return "#33ccff"
+  return "#0066cc"
 }

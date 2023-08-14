@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, ImageBackground, ScrollView, TouchableOpacity } from 'react-native'
 import React from 'react'
 import tw from 'twrnc'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -19,8 +19,9 @@ const AdvancedSetting = () => {
 export default function SettingsScreen() {
 
   return <>
-    <View style={[tw`pt-8`, styles.container]}>
-      <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`, styles.header]}>WeatherToGo</Text>
+    <View style={[tw`pt-6`, styles.container]}>
+      {/* <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`, styles.header]}>WeatherToGo</Text> */}
+      <ImageBackground style={tw`w-36 h-14 self-center`} imageStyle={[tw`rounded-lg`]} source={require("../assets/wtg/weathertogo_k.png")} resizeMode="contain" />
     </View>
     <TopTab.Navigator 
       initialRouteName="Basic" 

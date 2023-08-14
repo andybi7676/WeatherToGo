@@ -9,9 +9,10 @@ import WeatherIcon from './WeatherIcon';
 import { Dimensions } from "react-native";
 const screenWidth = Dimensions.get("window").width;
 import { LineChart, BarChart } from 'react-native-chart-kit';
+import { getCIBG } from '../utils/config'
 
 const MAX_FRAMES_IN_CARD = 8
-const VALID_SIMPLIFIED_ELEMENTNAMES = ["天氣現象", "體感溫度", "時間", "12小時降雨機率"]
+const VALID_SIMPLIFIED_ELEMENTNAMES = ["天氣現象", "體感溫度", "時間", "降雨機率"]
 const chartConfig = {
   backgroundGradientFrom: "#d8e0ed",
   backgroundGradientFromOpacity: 0,
@@ -31,20 +32,30 @@ const chartConfig = {
   // }
 };
 
-export default function FullWeatherInfo({id}) {
+export default function FullWeatherInfo({id, startIdx=0}) {
 
   const [simpleWeatherInfo, setSimpleWeatherInfo] = useState({})
   const weatherInfo = useSelector(selectWeatherInfos)[id]
-  
+  console.log(startIdx)
+
   useEffect(() => {
     if (weatherInfo.time.length <= 0) return;
     const elementLength = weatherInfo.time.length;
-    const downsample_rate = Math.ceil(elementLength / 8);
+    let slicedWeatherInfo = {}
+    if (startIdx < elementLength) {
+      for (const [key, value] of Object.entries(weatherInfo)) {
+        if (value.length !== undefined) {
+          slicedWeatherInfo[key] = value.slice(startIdx, startIdx+MAX_FRAMES_IN_CARD);
+        }
+      }
+    }
+    console.log(slicedWeatherInfo)
+    const downsample_rate = Math.ceil(slicedWeatherInfo.time.length / MAX_FRAMES_IN_CARD);
     let newSimpleWeatherInfo = {
-      elementLength: elementLength,
-      ...weatherInfo,
-      "降採時間": weatherInfo.time.filter((_, idx) => idx % downsample_rate === 0),
-      "天氣現象": weatherInfo['天氣現象'].filter((_, idx) => idx % downsample_rate === 0),
+      elementLength: slicedWeatherInfo.time.length,
+      ...slicedWeatherInfo,
+      "降採時間": slicedWeatherInfo.time.filter((_, idx) => idx % downsample_rate === 0),
+      "天氣現象": slicedWeatherInfo['天氣現象'].filter((_, idx) => idx % downsample_rate === 0),
     };
     newSimpleWeatherInfo.downsampledLength = newSimpleWeatherInfo["降採時間"].length;
     newSimpleWeatherInfo["shownDates"] = newSimpleWeatherInfo['降採時間'].map((secondTimeStamp, idx) => {
@@ -55,9 +66,9 @@ export default function FullWeatherInfo({id}) {
       else return `${curDate.month}/${curDate.date}`;
     })
     setSimpleWeatherInfo(newSimpleWeatherInfo);
-  }, [weatherInfo])
+  }, [weatherInfo, startIdx])
 
-  return <View style={tw`h-auto rounded-lg bg-slate-100 mt-1 pt-1 `}>
+  return <View style={tw`h-auto rounded-lg bg-slate-100 mt-1 p-1`}>
     <View style={tw`h-5 border-gray-500 flex flex-row justify-center `}>
       {
         simpleWeatherInfo["shownDates"]
@@ -84,7 +95,7 @@ export default function FullWeatherInfo({id}) {
         null
       }
     </View>
-    <View style={tw`h-10 z-10 border-black flex flex-row justify-center`}>
+    <View style={tw`h-10 z-10 flex flex-row justify-center`}>
       {
         simpleWeatherInfo["天氣現象"]
         ?
@@ -107,13 +118,13 @@ export default function FullWeatherInfo({id}) {
         null
       }
     </View>
-    <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+    <View style={tw`h-15 -mt-5 border-slate-300 flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
       {
         simpleWeatherInfo["體感溫度"]
         ?
         <LineChart
           data={{
-            labels: simpleWeatherInfo['時間'],
+            labels: simpleWeatherInfo['time'],
             datasets: [
               {
                 data: simpleWeatherInfo['體感溫度'],
@@ -146,16 +157,16 @@ export default function FullWeatherInfo({id}) {
         null
       }
     </View>
-    <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
-      {
-        simpleWeatherInfo["12小時降雨機率"]
-        ?
+    {
+      simpleWeatherInfo["降雨機率"]
+      ?
+      <View style={tw`h-15 -mt-6 -mb-2 border-slate-200 flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
         <LineChart
           data={{
-            labels: simpleWeatherInfo['時間'],
+            labels: simpleWeatherInfo['time'],
             datasets: [
               {
-                data: simpleWeatherInfo['12小時降雨機率'],
+                data: simpleWeatherInfo['降雨機率'],
                 // color: (opacity = 0) => `rgba(20, 20, 20, ${opacity})`, // optional
                 strokeWidth: 0, // optional
               }
@@ -179,35 +190,164 @@ export default function FullWeatherInfo({id}) {
             paddingRight:0
           }}
         />
-        // null
-        :
-        null
-      }
-    </View>
-    {/* <View style={tw`h-15 -mt-4 border-black border-2 flex flex-row justify-center `}>
-      {
-        simpleWeatherInfo["12小時降雨機率"]
-        ?
-        <BarChart
+      </View>
+      :
+      null
+    }
+    {
+      simpleWeatherInfo["風速"]
+      ?
+      <View style={tw`h-15 -mt-3 -mb-2 border-slate-300 flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+        <LineChart
           data={{
             labels: simpleWeatherInfo['time'],
             datasets: [
               {
-                data: simpleWeatherInfo['12小時降雨機率'],
-                // color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
-                // strokeWidth: 3, // optional
+                data: simpleWeatherInfo['風速'],
+                color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
+                strokeWidth: 3, // optional
               }
             ], 
             // legend: ["體感溫度"] // optional
           }}
-          width={screenWidth*0.9}
+          width={screenWidth*0.85}
           height={50}
           chartConfig={{
             ...chartConfig, 
-            color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`,
-            fillShadowGradientFrom: "#3ec4ed", 
+            fillShadowGradientFrom: "#94b8b8", 
             fillShadowGradientFromOpacity: 1,
-            fillShadowGradientTo: "#3ec4ed",
+            fillShadowGradientTo: "#94b8b8",
+            fillShadowGradientToOpacity: 0.3,
+          }}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          style={{
+            paddingRight:0
+          }}
+          bezier
+        />
+      </View>
+      :
+      null
+    }
+    {
+      simpleWeatherInfo["流速"]
+      ?
+      <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+        <LineChart
+          data={{
+            labels: simpleWeatherInfo['time'],
+            datasets: [
+              {
+                data: simpleWeatherInfo['流速'],
+                color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
+                strokeWidth: 3, // optional
+              }
+            ], 
+            // legend: ["體感溫度"] // optional
+          }}
+          width={screenWidth*0.85}
+          height={50}
+          chartConfig={{
+            ...chartConfig, 
+            fillShadowGradientFrom: "#94b8b8", 
+            fillShadowGradientFromOpacity: 1,
+            fillShadowGradientTo: "#94b8b8",
+            fillShadowGradientToOpacity: 0.3,
+          }}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          style={{
+            paddingRight:0
+          }}
+          bezier
+        />
+        // null
+      </View>
+      :
+      null
+    }
+    {
+      simpleWeatherInfo["浪高"]
+      ?
+      <View style={tw`h-15 -mt-5 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+        <LineChart
+          data={{
+            labels: simpleWeatherInfo['time'],
+            datasets: [
+              {
+                data: simpleWeatherInfo['浪高'],
+                color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
+                strokeWidth: 3, // optional
+              }
+            ], 
+            // legend: ["體感溫度"] // optional
+          }}
+          width={screenWidth*0.85}
+          height={50}
+          chartConfig={{
+            ...chartConfig, 
+            fillShadowGradientFrom: "#94b8b8", 
+            fillShadowGradientFromOpacity: 1,
+            fillShadowGradientTo: "#94b8b8",
+            fillShadowGradientToOpacity: 0.3,
+          }}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          style={{
+            paddingRight:0
+          }}
+          bezier
+        />
+      </View>
+      :
+      null
+    }
+    {
+      simpleWeatherInfo["舒適度指數"]
+      ?
+      <View style={tw`h-10 z-10 py-1 border-black flex flex-row justify-center opacity-70`}>
+        {
+          simpleWeatherInfo["舒適度指數"].map((ci, idx) => {
+            //* <Text style={tw`self-center text-base`}>{weather}</Text> */}
+            return <View key={idx} style={[tw`basis-1/${simpleWeatherInfo.downsampledLength} h-9 justify-center`, {backgroundColor: getCIBG(ci)}]}>
+              
+            </View>
+          })
+        }
+      </View>
+      :
+      null
+    }
+    <View style={tw`h-15 -mt-2 -mb-1 border-black flex flex-row justify-center pl-${8-simpleWeatherInfo.downsampledLength+3}`}>
+      {
+        simpleWeatherInfo["紫外線指數"]
+        ?
+        <LineChart
+          data={{
+            labels: simpleWeatherInfo['time'],
+            datasets: [
+              {
+                data: simpleWeatherInfo['紫外線指數'],
+                color: (opacity = 1) => `rgba(20, 20, 20, ${opacity})`, // optional
+                strokeWidth: 3, // optional
+              }
+            ], 
+            // legend: ["體感溫度"] // optional
+          }}
+          width={screenWidth*0.85}
+          height={50}
+          chartConfig={{
+            ...chartConfig, 
+            fillShadowGradientFrom: "#bf80ff", 
+            fillShadowGradientFromOpacity: 1,
+            fillShadowGradientTo: "#bf80ff",
             fillShadowGradientToOpacity: 0.3,
           }}
           withHorizontalLabels={false}
@@ -223,7 +363,7 @@ export default function FullWeatherInfo({id}) {
         :
         null
       }
-    </View> */}
+    </View>
   </View>
 }
 

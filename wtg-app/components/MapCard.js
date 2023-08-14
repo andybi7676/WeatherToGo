@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity, Pressable, Dimensions } from 'react-native'
-import { Skeleton, Icon, Button } from '@rneui/themed';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native'
+import { Skeleton, Icon, SocialIcon } from '@rneui/themed';
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux';
@@ -63,14 +63,24 @@ export default function MapCard({ id }) {
           </View>
         </View>
         <View style={tw`flex flex-row`}>
-          <View style={tw`basis-1/3 flex-row p-1 h-8 `}>
-            <Text >WTG: </Text>
+          <View style={tw`basis-1/3 flex-row p-1 h-8`}>
+            <SocialIcon style={tw`self-center opacity-75`} type='google' iconSize={9}/>
+            {
+              item.weatherInfoLoaded
+              ?
+              <Text>{wrapString(`${item.google_rating}`, 3, "")}</Text>
+              :
+              <Skeleton animation="wave" style={tw`rounded-lg opacity-15 h-full w-13`} />
+            }
+          </View>
+          <View style={tw`basis-1/3 flex-row p-1 pl-5 h-8 `}>
+            <ImageBackground style={tw`w-10 h-8 self-center mr-1`} imageStyle={[tw`rounded-lg`]} source={require("../assets/wtg/weathertogo_k.png")} resizeMode="contain" />
             {
               item.weatherInfoLoaded
               ?
               <Text>{wrapString(`${item.rating}`, 3, "")}</Text>
               :
-              <Skeleton animation="wave" style={tw`rounded-lg opacity-15 h-full w-15`} />
+              <Skeleton animation="wave" style={tw`rounded-lg opacity-15 h-full w-13`} />
             }
           </View>
         </View>

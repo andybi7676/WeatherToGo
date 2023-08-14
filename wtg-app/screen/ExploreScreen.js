@@ -1,4 +1,4 @@
-import { Text, View, SafeAreaView } from 'react-native'
+import { ImageBackground, Text, View, SafeAreaView } from 'react-native'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Dimensions } from 'react-native';
@@ -77,8 +77,9 @@ export default function ExploreScreen({ navigation }) {
           />
         ))}
       </MapView>
-      <View style={[tw`pt-8 bg-gray-100 w-full shadow-xl`]}>
-        <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`]}>WeatherToGo</Text>
+      <View style={[tw`pt-6 bg-gray-100 w-full shadow-xl`]}>
+        {/* <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`]}>WeatherToGo</Text> */}
+        <ImageBackground style={tw`w-36 h-14 self-center`} imageStyle={[tw`rounded-lg`]} source={require("../assets/wtg/weathertogo_k.png")} resizeMode="contain" />
       </View>
       <SafeAreaView style={[tw`w-7/8 h-12 self-center m-4 mt-12 border-gray-400 border-2 rounded-full bg-white`, styles.input]} >
         <GooglePlaceInput coordinate={coordinate} delta={delta} />

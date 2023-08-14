@@ -75,7 +75,7 @@ export default function BasicSetting() {
             'end': weatherToGoSetting.endTime / 1000,
           },
           'activity': {
-            'type': '日常',
+            'type': weatherToGoSetting.chosenType,
           }
         }
       ),
