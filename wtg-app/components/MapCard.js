@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable, Dimensions } from 'react-native'
-import { Skeleton } from '@rneui/themed';
+import { Skeleton, Icon } from '@rneui/themed';
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,7 +46,7 @@ export default function MapCard({ index }) {
         <View style={tw`flex flex-row`}>
           <Text style={tw`text-base font-semibold basis-3/4`}>{wrapString(item.name, 15)}</Text>
           <View style={tw`basis-1/4 -mb-5 flex-row justify-end p-2 pr-4`}>
-            <Text >Icon</Text>
+            <Icon name="plus" type="font-awesome" onPress={console.log("pressed")}></Icon>
           </View>
         </View>
         <View style={tw`flex flex-row`}>
