@@ -22,8 +22,8 @@ data_url = 'http://127.0.0.1:5000/' + 'get_weather'  # adjusted for your IP addr
 input data
 below is following the steps that the user will do in the app
 '''
-time_start = '2023-08-14T00:00:00+08:00'
-time_end = '2023-08-20T12:00:00+08:00'
+time_start = '2023-08-14T18:00:00+08:00'
+time_end = '2023-08-20T11:00:00+08:00'
 
 # Step 1: time setting
 time_setting = {
@@ -37,7 +37,7 @@ check_response(response)
 
 # Step 2: activity setting
 activity = {
-        'type': '日常'
+        'type': '觀星'  # '日常' / '登山' / '跳傘' / '潛水' / '衝浪' / '觀星'
 }
 input_data2 = {'activity': activity}
 response = requests.post(data_url, json=input_data2)
@@ -52,6 +52,7 @@ test_loc = {
 input_data3 = {'location': test_loc}
 response = requests.post(data_url, json=input_data3)
 weather_data = check_response(response)
+print(weather_data['weather']['var_name'])
 
 
 # Step 4: reset
