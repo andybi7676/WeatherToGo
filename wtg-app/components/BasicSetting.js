@@ -57,6 +57,7 @@ export default function BasicSetting() {
       dispatch(setTime({startTime: currentRoundedTimeStamp, endTime: currentRoundedTimeStamp+SEGMENT_MILLISECONDS*55}));
     }
     if (postBasicSettingConn.success && needReloaded) {
+      console.log("reload all places")
       dispatch(reloadAllPlaces());
       setNeedReloaded(false);
     }
@@ -74,7 +75,7 @@ export default function BasicSetting() {
             'end': weatherToGoSetting.endTime / 1000,
           },
           'activity': {
-            'type': 'daily',
+            'type': '日常',
           }
         }
       ),

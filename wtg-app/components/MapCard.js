@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, TouchableOpacity, Pressable, Dimensions } from 'react-native'
-import { Skeleton, Icon } from '@rneui/themed';
+import { Skeleton, Icon, Button } from '@rneui/themed';
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux';
-import { updateOnePlace } from '../redux/explore/placesInfoSlice';
+import { updateOnePlace, toggleOneFavorite } from '../redux/explore/placesInfoSlice';
 import { useAPI } from '../hooks';
 import { DATA_SERVER_URL } from "@env"
 import SimplifiedWeatherInfo from './SimplifiedWeatherInfo';
@@ -19,6 +19,7 @@ export default function MapCard({ index }) {
 
   useEffect(() => {
     if (weatherInfoConn.isInit() || (item.weatherInfoLoaded === false && weatherInfoConn.loading === false)) {
+      console.log(`index ${item.index} loading, item.weatherInfoLoaded=${item.weatherInfoLoaded}`)
       getWeatherInfo(
         `${DATA_SERVER_URL}/get_weather`,
         "POST",
@@ -33,6 +34,10 @@ export default function MapCard({ index }) {
     }
     if(weatherInfoConn.success && item.weatherInfoLoaded === false) {
       const result = weatherInfoConn.response.weather || null;
+      if (result !== null) {
+        console.log(result.Elements.filter((e) => e.description=="時間")[0].Value.length)
+      }
+      
       dispatch(updateOnePlace({index, newPlace: {...item, weatherInfo: result, weatherInfoLoaded: true}}));
       // console.log(result);
       // setWeatherInfo(result);
@@ -45,8 +50,17 @@ export default function MapCard({ index }) {
       <TouchableOpacity >
         <View style={tw`flex flex-row`}>
           <Text style={tw`text-base font-semibold basis-3/4`}>{wrapString(item.name, 15)}</Text>
-          <View style={tw`basis-1/4 -mb-5 flex-row justify-end p-2 pr-4`}>
-            <Icon name="plus" type="font-awesome" onPress={console.log("pressed")}></Icon>
+          <View style={tw`basis-1/4 -mb-10 flex-row justify-end p-2 pt-1`}>
+            <Button radius={"sm"} type="clear" onPress={() => dispatch(toggleOneFavorite(item.index))}>
+              {
+                item.isFavorite === true
+                ?
+                <Icon name="close" type="font-awesome" size={30}/>
+                
+                :
+                <Icon name="plus" type="font-awesome" size={30}/>
+              }
+            </Button>
           </View>
         </View>
         <View style={tw`flex flex-row`}>

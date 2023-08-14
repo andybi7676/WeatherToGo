@@ -13,8 +13,6 @@ const window = Dimensions.get('window')
 
 export default function FavoriteCard({ index, item }) {
   // const [ weatherInfo, setWeatherInfo ] = useState(null);
-  const dispatch = useDispatch();
-  const favoritePlaces = useSelector()
   // const item = useSelector((state) => state.placesInfo.places[index])
 
   return (

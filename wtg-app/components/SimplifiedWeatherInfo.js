@@ -9,7 +9,7 @@ const screenWidth = Dimensions.get("window").width;
 import { LineChart } from 'react-native-chart-kit';
 
 const MAX_FRAMES_IN_CARD = 8
-const VALID_SIMPLIFIED_ELEMENTNAMES = ["天氣預報綜合描述", "體感溫度", "降雨機率", "時間"]
+const VALID_SIMPLIFIED_ELEMENTNAMES = ["天氣現象", "體感溫度", "降雨機率", "時間", "12小時降雨機率"]
 const chartConfig = {
   backgroundGradientFrom: "#d8e0ed",
   backgroundGradientFromOpacity: 0,
@@ -40,8 +40,8 @@ export default function SimplifiedWeatherInfo({weatherInfo}) {
     let newSimpleWeatherInfo = {};
     newSimpleWeatherInfo.elementLength = elementLength
     weatherInfo.Elements.filter((element) => VALID_SIMPLIFIED_ELEMENTNAMES.includes(element.description)).map((element) => {
-      if (element.description === "天氣預報綜合描述") {
-        newSimpleWeatherInfo["天氣現象"] = element.Value.filter((_, idx) => idx % downsample_rate === 0).map((desc) => desc.split('。')[0])
+      if (element.description === "天氣現象" && element.Measures === '自定義 Wx 文字') {
+        newSimpleWeatherInfo["天氣現象"] = element.Value.filter((_, idx) => idx % downsample_rate === 0)
       }
       else if (element.description === "時間") {
         newSimpleWeatherInfo["降採時間"] = element.Value.filter((_, idx) => idx % downsample_rate === 0)
@@ -144,7 +144,6 @@ export default function SimplifiedWeatherInfo({weatherInfo}) {
           withDots={false}
           withInnerLines={false}
           style={{
-            // borderBottomRightRadius: 10,
             paddingRight:0
           }}
           bezier

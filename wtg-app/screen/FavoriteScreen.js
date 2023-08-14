@@ -2,25 +2,33 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import { Divider } from '@rneui/base'
 import { FavoriteCard } from '../components';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectPlaces } from '../redux/explore/placesInfoSlice';
 import React from 'react'
 import tw from 'twrnc'
 
 export default function FavoriteScreen() {
+  const favoritePlaces = useSelector(selectPlaces);
+  console.log(favoritePlaces);
+
   return <>
-    <View style={[tw`pt-8`, styles.container]}>
+    <View style={[tw`pt-8 shadow-lg`, styles.container]}>
       <Text style={[tw`text-center text-xl tracking-wide font-bold py-2 text-slate-600`, styles.header]}>WeatherToGo</Text>
     </View>
+    <Text style={tw`bg-white text-lg p-2 font-semibold text-slate-500 text-center` }>我的最愛</Text>
     <ScrollView style={[tw`p-2`]}>
-      <View style={tw`flex rounded-3xl bg-white py-3 my-2 justify-center`}>
-        <Text style={tw`text-xl text-slate-500 p-2 pl-3 pt-1 pb-0 font-semibold`}>選擇活動從事的時間</Text>
-        {/* <Text style={tw`text-sm text-slate-400 pl-3 w-70`}>將根據選擇的時段進行天氣資訊的呈現與推薦</Text> */}
-        <Divider/>
-        <View style={tw`self-center justify-end h-26 p-2 pb-4`}>
-          
-        </View>
-      </View>
       {
-
+        favoritePlaces.filter((place) => place.isFavorite === true).length > 0
+        ?
+        favoritePlaces.filter((place) => place.isFavorite === true).map((placeInfo, idx) => {
+          return (
+            <FavoriteCard
+              index={idx}
+              item={placeInfo}
+            />
+          )
+        })
+        :
+        null
       }
     </ScrollView>
     

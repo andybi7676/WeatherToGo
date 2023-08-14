@@ -9,7 +9,7 @@ import { GOOGLE_MAP_API_KEY } from "@env"
 import { useAPI } from '../hooks';
 import tw from 'twrnc'
 
-const MAX_PLACES = 15
+const MAX_PLACES = 10
 const LONGTITUDE_DELTA_METERS_RATIO = 111139
 
 export default function GooglePlaceInput({ coordinate, delta }) {
@@ -37,7 +37,7 @@ export default function GooglePlaceInput({ coordinate, delta }) {
           "google_map_link": `https://www.google.com/maps/place/?q=place_id:${res.place_id}`,
           "rating": rating = Math.round(Math.random() * 4 + 1),
           "weatherInfoLoaded": false,
-          "favorite": false
+          "isFavorite": false
         };
         return newPlace;
       });
@@ -46,7 +46,7 @@ export default function GooglePlaceInput({ coordinate, delta }) {
   }, [searchPlacesConn]);
 
   const search = () => {
-    dispatch(deleteAllPlaces());
+    // dispatch(deleteAllPlaces());
     const config = {
       url: `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${coordinate.latitude}%2C${coordinate.longitude}&radius=${radius}&keyword=${prompt}&key=${GOOGLE_MAP_API_KEY}&language=zh-TW`,
       method: "GET",

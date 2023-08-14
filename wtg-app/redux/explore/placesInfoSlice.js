@@ -41,6 +41,13 @@ export const placesInfoSlice = createSlice({
       }
     },
 
+    toggleOneFavorite: (state, action) => {
+      const updateIdx = action.payload;
+      if (updateIdx < state.places.length) {
+        state.places[updateIdx].isFavorite = !state.places[updateIdx].isFavorite;
+      }
+    },
+
     deleteAllPlaces: (state) => {
       state.places = [],
       state.curIdx = {
@@ -67,6 +74,6 @@ export const selectPlaces = state => state.placesInfo.places;
 export const selectPlacesCurIdx = state => state.placesInfo.curIdx;
 // export const selectFavoritePlaces = state => state.placesInfo.places.filter((place) => place.isFavorite === true)
 // Action creators are generated for each case reducer function
-export const { changePlaces, changeCurIdx, updateOnePlace, deleteAllPlaces, reloadAllPlaces } = placesInfoSlice.actions;
+export const { changePlaces, changeCurIdx, updateOnePlace, toggleOneFavorite, deleteAllPlaces, reloadAllPlaces } = placesInfoSlice.actions;
 
 export default placesInfoSlice.reducer;
