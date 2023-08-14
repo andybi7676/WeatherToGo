@@ -12,24 +12,24 @@ acticity_list = {
             '12hr': ['Wx','PoP12h','MaxAT','WS','MaxCI']}
 }
 
-# time_start = '2023-08-14T00:00:00+08:00'
-# time_end = '2023-08-20T12:00:00+08:00'
+time_start = '2023-08-14T00:00:00+08:00'
+time_end = '2023-08-20T12:00:00+08:00'
 
-# time_setting = {
-#     'start': int(time.mktime(time.strptime(time_start, "%Y-%m-%dT%H:%M:%S+08:00"))),
-#     'end': int(time.mktime(time.strptime(time_end, "%Y-%m-%dT%H:%M:%S+08:00")))
-# }
+time_setting = {
+    'start': int(time.mktime(time.strptime(time_start, "%Y-%m-%dT%H:%M:%S+08:00"))),
+    'end': int(time.mktime(time.strptime(time_end, "%Y-%m-%dT%H:%M:%S+08:00")))
+}
 
-# activity = {
-#         'type': '日常'
-# }
+activity = {
+        'type': '日常'
+}
 
-# test_loc = {
-#     'lon': 121.630132,
-#     'lat': 24.024398
-# }
+test_loc = {
+    'lon': 121.630132,
+    'lat': 24.024398
+}
 
-# data = { 'time_setting': time_setting, 'activity': activity, 'location': test_loc}
+data = { 'time_setting': time_setting, 'activity': activity, 'location': test_loc}
 
 
 def find_neareat_location(loc_dict):
@@ -108,28 +108,31 @@ def get_weather_data(data):
     time_list3 = np.append(time_list3, time_list12[~np.in1d(time_list12, time_list3)])
     tstr = time_list3[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])]
 
+    # drop duplicates
+    var_list = data_list3.index.get_level_values(0).tolist()
+    var_list_name = data_list3.index.get_level_values(1).drop_duplicates(keep = 'first').tolist()
+    du =[idx for idx, item in enumerate(var_list) if item in var_list[:idx]]
+    data_list3.drop(data_list3.index[du], inplace=True)
+    var_list = list(set(var_list))
+
+
     # and return it in json
     weather_info = {
         'attraction': loc_name,
         'lon'       : lon,
         'lat'       : lat,
-        'Elements'  : [
-            {
-                'ElementName'   : row[0],
-                'description'   : row[1],
-                'Measures'      : row[2],
-                'Value'         : np.array(data_list3.loc[row]['Value'])[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])].tolist()
-            }
-            for row in data_list3.index
-        ]
+        'var_name'  : var_list_name
     }
-    weather_info['Elements'].append({
-        'ElementName':'Time',
-        'description': '時間',
-        'Measures': 's',
-        'Value': [int(time.mktime(time.strptime(tsp, "%Y-%m-%dT%H:%M:%S+08:00"))) for tsp in tstr]
-        # 'Value': tstr
-        })
 
+    # add weather data
+    weather_info.update({var_list_name[v]: np.array(data_list3.iloc[v]['Value'])[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])].tolist() for v in range(len(var_list))})
+
+    # add time
+    weather_info['time'] = [int(time.mktime(time.strptime(tsp, "%Y-%m-%dT%H:%M:%S+08:00"))) for tsp in tstr]
+
+    # add rating with the randome float number btn. 0~5
+    weather_info['rating'] = np.average(np.random.rand())*5
 
     return weather_info
+
+# weather_info = get_weather_data(data)
