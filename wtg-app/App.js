@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { ExploreScreen, SettingsScreen } from './screen';
+import { ExploreScreen, SettingsScreen, FavoriteScreen } from './screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -39,7 +39,16 @@ export default function App() {
                 tabBarLabel: "Explore",
                 tabBarIcon: ({color}) => <Icon name={"explore"} color={color}></Icon>,
               }} 
-              />
+            />
+            <Tab.Screen 
+              name="Favorite"
+              component={FavoriteScreen}
+              options={{
+                headerShown: false, 
+                tabBarLabel: "Favorite",
+                tabBarIcon: ({color}) => <Icon name={"star"} color={color}></Icon>,
+              }} 
+            />
           </Tab.Navigator>
         </SafeAreaProvider>
       </NavigationContainer>

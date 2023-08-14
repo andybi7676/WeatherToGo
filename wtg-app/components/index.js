@@ -9,6 +9,7 @@ import WeatherPreferenceSetting from "./WeatherPreferenceSetting";
 import BasicSetting from "./BasicSetting";
 import SimplifiedWeatherInfo from "./SimplifiedWeatherInfo";
 import WeatherIcon from "./WeatherIcon";
+import FavoriteCard from "./FavoriteCard";
 
 export {
     MapCard,
@@ -22,4 +23,5 @@ export {
     BasicSetting,
     SimplifiedWeatherInfo,
     WeatherIcon,
+    FavoriteCard,
 };

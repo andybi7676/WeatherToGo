@@ -101,7 +101,7 @@ export default function ExploreScreen({ navigation }) {
               parallaxScrollingScale: 0.9,
               parallaxScrollingOffset: 50,
             }}
-            renderItem={({ item }) => <MapCard item={item} />}
+            renderItem={({ item }) => <MapCard key={`${item.index}-${item.name}`} index={item.index} item={item} />}
           />
           :
           null

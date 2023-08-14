@@ -18,11 +18,13 @@ export const placesInfoSlice = createSlice({
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes.
       // Also, no return statement is required from these functions.
-      state.places = action.payload;
+      const favoritePlaces = state.places.filter((place) => place.isFavorite === true)
+      state.places = [...favoritePlaces.map((place, idx) => ({...place, index: idx})), ...action.payload] ;
       state.curIdx = {
-        value: Math.min(action.payload.length-1, 0),
+        value: Math.min((favoritePlaces.length + action.payload.length)-1, 0),
         source: 'searchInput',
       }
+      // console.log(state.places)
     },
     
     changeCurIdx: (state, action) => {
@@ -38,13 +40,33 @@ export const placesInfoSlice = createSlice({
         state.places[updateIdx] = action.payload.newPlace;
       }
     },
+
+    deleteAllPlaces: (state) => {
+      state.places = [],
+      state.curIdx = {
+        value: -1,
+        source: 'searchInput',
+      }
+    },
+
+    reloadAllPlaces: (state) => {
+      state.places = state.places.map((place, _) => {
+        return {
+          ...place,
+          weatherInfo: null,
+          weatherInfoLoaded: false,
+          isFavorite: false,
+        }
+      })
+    }
   },
 })
 
 export const selectPlacesInfo = state => state.placesInfo;
 export const selectPlaces = state => state.placesInfo.places;
 export const selectPlacesCurIdx = state => state.placesInfo.curIdx;
+// export const selectFavoritePlaces = state => state.placesInfo.places.filter((place) => place.isFavorite === true)
 // Action creators are generated for each case reducer function
-export const { changePlaces, changeCurIdx, updateOnePlace } = placesInfoSlice.actions;
+export const { changePlaces, changeCurIdx, updateOnePlace, deleteAllPlaces, reloadAllPlaces } = placesInfoSlice.actions;
 
 export default placesInfoSlice.reducer;

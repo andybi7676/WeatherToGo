@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import tw from 'twrnc'
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { chooseType, setTime, selectWeatherToGoSetting } from '../redux/settings/weatherToGoSettingSlice';
+import { deleteAllPlaces, reloadAllPlaces } from '../redux/explore/placesInfoSlice';
 import { SEGMENT_MILLISECONDS, getRoundedTimeStamp, getSegTime } from '../utils/time';
 import { eventTypes, weatherTypes } from '../utils/config';
 import { useAPI } from '../hooks';
@@ -49,13 +50,20 @@ export default function BasicSetting() {
   const dispatch = useDispatch();
   const weatherToGoSetting = useSelector(selectWeatherToGoSetting);
   const [postBasicSettingConn, postBasicSetting] = useAPI('json');
-  const [closeLoading, setCloseLoading] = useState(false);
+  const [ needReloaded, setNeedReloaded ] = useState(false);
   
   useEffect(() => {
-    dispatch(setTime({startTime: currentRoundedTimeStamp, endTime: currentRoundedTimeStamp+SEGMENT_MILLISECONDS*55}));
-  }, []);
+    if (postBasicSettingConn.isInit()) {
+      dispatch(setTime({startTime: currentRoundedTimeStamp, endTime: currentRoundedTimeStamp+SEGMENT_MILLISECONDS*55}));
+    }
+    if (postBasicSettingConn.success && needReloaded) {
+      dispatch(reloadAllPlaces());
+      setNeedReloaded(false);
+    }
+  }, [postBasicSettingConn]);
   
   useEffect(() => {
+    setNeedReloaded(true);
     postBasicSetting(
       `${DATA_SERVER_URL}/get_weather`,     //url
       "POST",                               //method

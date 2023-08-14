@@ -1,9 +1,0 @@
-{"Elements": [
-  {"ElementName": "WeatherDescription", "Measures": "NA", "Value": ["Array"], "description": "天氣預報綜合描述"}, 
-  {"ElementName": "AT", "Measures": "攝氏度", "Value": ["Array"], "description": "體感溫度"}, 
-  {"ElementName": "WS", "Measures": "公尺/秒", "Value": ["Array"], "description": "風速"}, 
-  {"ElementName": "WS", "Measures": "蒲福風級", "Value": ["Array"], "description": "風速"}, 
-  {"ElementName": "CI", "Measures": "NA", "Value": ["Array"], "description": "舒適度指數"}, 
-  {"ElementName": "CI", "Measures": "自定義 CI 文字", "Value": ["Array"], "description": "舒適度指數"}, 
-  {"ElementName": "Time", "Measures": "s", "Value": ["Array"], "description": "時間"}],
-"attraction": "六張犁捷運站", "lat": 25.0368073, "lon": 121.5478677}
