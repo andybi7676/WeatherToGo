@@ -47,7 +47,8 @@ check_response(response)
 # Step 3: location setting
 test_loc = {
     'lon': 121.630132,
-    'lat': 24.024398
+    'lat': 24.024398,
+    'adjusted_ratio': 0 # optional, range from 0 to 1, the higher ratio the higher and denser ratings
 }
 input_data3 = {'location': test_loc}
 response = requests.post(data_url, json=input_data3)

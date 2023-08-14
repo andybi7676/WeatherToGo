@@ -20,6 +20,16 @@ acticity_list = {
         '12hr': ['Wx','PoP12h','MaxAT','WS','MaxCI']}
 }
 
+activity_ref_list=  {
+    '日常': { '降雨機率': 0, '體感溫度': 25, '風速': 3, '舒適度指數': 23, '紫外線指數': 3},
+    '登山': { '降雨機率': 0, '體感溫度': 25, '風速': 5, '舒適度指數': 23, '紫外線指數': 5},
+    '跳傘': { '降雨機率': 0, '體感溫度': 30, '風速': 5, '舒適度指數': 23, '紫外線指數': 5},
+    '潛水': { '降雨機率': 0, '體感溫度': 30, '紫外線指數': 5, '流速': 0, '浪高': 0},
+    '衝浪': { '降雨機率': 0, '體感溫度': 30, '紫外線指數': 5, '流速': 0, '浪高': 1.5},
+    '觀星': { '降雨機率': 0, '體感溫度': 25, '風速': 3, '舒適度指數': 23},
+    'range': {'降雨機率': 100, '體感溫度': 20, '風速': 10, '舒適度指數': 12, '紫外線指數': 11, '流速': 1, '浪高': 1.5}
+}
+
 # time_start = '2023-08-14T20:00:00+08:00'
 # time_end = '2023-08-20T12:00:00+08:00'
 
@@ -77,6 +87,25 @@ def find_neareat_location(loc_dict, ocean=False):
 
 
     return(loc_result)
+
+
+def weather_rating(weather_info, activity_type, adjusted_ratio):
+
+    # get the weather information
+    var_name = weather_info['var_name']
+    # var_value = [weather_info[var] for var in var_name[1:]]
+    activity_type = activity_type['type']
+    
+    # average var in each element in dict
+    ave = {var: np.average(np.array(weather_info[var]).astype(float)) for var in var_name[1:]}
+    # var_value = np.array(var_value).astype(float)
+
+    diff = [abs((ave[var] - activity_ref_list[activity_type][var])/activity_ref_list['range'][var]) for var in var_name[1:]]
+
+    # rating
+    rating  = 5 - np.sum(diff)*(1-adjusted_ratio)
+    
+    return(rating)
 
 
 def get_weather_data(data):
@@ -200,8 +229,8 @@ def get_weather_data(data):
         # merge data
         time_listo = np.array([dt.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S+08:00') for date in time_listo])
         time_listo = np.array([d.strftime('%Y-%m-%dT%H:%M:%S+08:00') for d in time_listo])
-        fw = np.array(data_listo.loc['流速']['Value'])[(time_listo >= time_interval[0]) & (time_listo <= time_interval[1])]
-        wv = np.array(data_listo.loc['浪高']['Value'])[(time_listo >= time_interval[0]) & (time_listo <= time_interval[1])]
+        fw = np.array(((data_listo.loc['流速']['Value'])*3)[:len(time_list3)])[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])]
+        wv = np.array(((data_listo.loc['浪高']['Value'])*3)[:len(time_list3)])[(time_list3 >= time_interval[0]) & (time_list3 <= time_interval[1])]
         
         weather_info.update({
             '流速': fw.tolist(),
@@ -215,8 +244,17 @@ def get_weather_data(data):
     # weather_info['time'] = tstr
 
     # add rating with the randome float number btn. 0~5
-    weather_info['rating'] = np.average(np.random.rand())*5
+    
+    if 'adjusted_ratio' in loc_dict:
+        adjusted_ratio = loc_dict['adjusted_ratio']
+    else:
+        adjusted_ratio = 0
+    weather_info['rating'] = weather_rating(weather_info, activity_type, adjusted_ratio)
 
     return weather_info
 
+
 # weather_info = get_weather_data(data)
+
+
+
