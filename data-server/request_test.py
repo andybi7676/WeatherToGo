@@ -37,7 +37,7 @@ check_response(response)
 
 # Step 2: activity setting
 activity = {
-        'type': '溼冷有風'  
+        'type': '豔陽高照'  
         # specific activity '日常' / '登山' / '跳傘' / '潛水' / '衝浪' / '觀星'
         # non-chosen activity '豔陽高照' / '風和日麗' / '涼爽乾燥' / '溼冷有風' 
 }
@@ -48,14 +48,14 @@ check_response(response)
 
 # Step 3: location setting
 test_loc = {
-    'lon': 121.630132,
-    'lat': 24.024398,
+    'lon': 120.630132,
+    'lat': 23.024398,
     'adjusted_ratio': 0 # optional, range from 0 to 1, the higher ratio the higher and denser ratings
 }
 input_data3 = {'location': test_loc}
 response = requests.post(data_url, json=input_data3)
 weather_data = check_response(response)
-print(weather_data['weather']['var_name'])
+# print(weather_data['weather']['var_name'])
 
 
 # Step 4: reset

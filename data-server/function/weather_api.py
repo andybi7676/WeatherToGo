@@ -62,8 +62,8 @@ activity_ref_list=  {
 # }
 
 # test_loc = {
-#     'lon': 121.630132,
-#     'lat': 24.024398
+#     'lon': 121.630,
+#     'lat': 23.024398
 # }
 
 # data = { 'time_setting': time_setting, 'activity': activity, 'location': test_loc}
@@ -112,11 +112,14 @@ def weather_rating(weather_info, activity_type, adjusted_ratio):
 
     # get the weather information
     var_name = weather_info['var_name']
-    # var_value = [weather_info[var] for var in var_name[1:]]
     activity_type = activity_type['type']
+
+    # str to float issue
+    for var in var_name[1:]:
+        weather_info[var] = [data.split(' ')[-1] if list(data)[0] == '>' or list(data)[0] == '<'  else data for data in weather_info[var]]
     
     # average var in each element in dict
-    ave = {var: np.average(np.array(weather_info[var]).astype(float)) for var in var_name[1:]}
+    ave = {var: np.average(np.array(weather_info[var]).astype(float))for var in var_name[1:]}
     # var_value = np.array(var_value).astype(float)
 
     diff = [abs((ave[var] - activity_ref_list[activity_type][var])/activity_ref_list['range'][var]) for var in var_name[1:]]
