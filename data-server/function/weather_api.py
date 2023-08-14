@@ -112,6 +112,9 @@ def get_weather_data(data):
     var_list = data_list3.index.get_level_values(0).tolist()
     var_list_name = data_list3.index.get_level_values(1).drop_duplicates(keep = 'first').tolist()
     du =[idx for idx, item in enumerate(var_list) if item in var_list[:idx]]
+    # Wx
+    du = [0 if x==1 else x for x in du]
+
     data_list3.drop(data_list3.index[du], inplace=True)
     var_list = list(set(var_list))
 
