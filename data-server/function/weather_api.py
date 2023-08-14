@@ -4,12 +4,12 @@ import xarray as xr
 import time
 
 # input red data
-loc_ref = xr.open_dataset('attractions_index.nc')
-# loc_ref = xr.open_dataset('function/attractions_index.nc')
+# loc_ref = xr.open_dataset('attractions_index.nc')
+loc_ref = xr.open_dataset('function/attractions_index.nc')
 
 acticity_list = {
-    '日常': {'3hr': ['WeatherDescription','PoP12h','AT','WS','CI'],
-            '12hr': ['WeatherDescription','PoP12h','MaxAT','WS','MaxCI']}
+    '日常': {'3hr': ['Wx','PoP12h','AT','WS','CI'],
+            '12hr': ['Wx','PoP12h','MaxAT','WS','MaxCI']}
 }
 
 # time_start = '2023-08-14T00:00:00+08:00'
@@ -127,8 +127,8 @@ def get_weather_data(data):
         'ElementName':'Time',
         'description': '時間',
         'Measures': 's',
-        # 'Value': [int(time.mktime(time.strptime(tsp, "%Y-%m-%dT%H:%M:%S+08:00"))) for tsp in tstr]
-        'Value': tstr
+        'Value': [int(time.mktime(time.strptime(tsp, "%Y-%m-%dT%H:%M:%S+08:00"))) for tsp in tstr]
+        # 'Value': tstr
         })
 
 
