@@ -37,7 +37,9 @@ check_response(response)
 
 # Step 2: activity setting
 activity = {
-        'type': '觀星'  # '日常' / '登山' / '跳傘' / '潛水' / '衝浪' / '觀星'
+        'type': '溼冷有風'  
+        # specific activity '日常' / '登山' / '跳傘' / '潛水' / '衝浪' / '觀星'
+        # non-chosen activity '豔陽高照' / '風和日麗' / '涼爽乾燥' / '溼冷有風' 
 }
 input_data2 = {'activity': activity}
 response = requests.post(data_url, json=input_data2)
